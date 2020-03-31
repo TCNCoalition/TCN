@@ -230,3 +230,15 @@ report. In that scheme we provide a signature on `(S = vk, L, Kj-1, j-1, j_max)`
 with the report. Others accept if the signature is valid under the included `vk`.
 In this scheme the health authorities or anyone else can check the signed
 record, and do not have to be trusted to mitigate impersonation.
+
+### Attacks
+
+#### Linkage Attack
+A [linkage attack](https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
+is the matching of anonymized records with non-anonymized records in a different
+dataset. An example for our usecase would be: A user is only close to one other
+person in a given timeframe. If they get notified of a revealed contact, they
+know who it was. Generally: If the timeframe of a contact is revealed, and users
+do out of band correlation, like taking notes/pictures, they can narrow down the
+possible real identies of their contacts, which revealed. As long as the users
+know which CENs are in the intersection, this can not be prevented.
