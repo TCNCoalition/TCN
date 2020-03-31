@@ -140,7 +140,8 @@ location history.
 Finally, Bluetooth itself exposes a number of tracking opportunities due to the
 handling of MAC addresses and other identifiers. Unfortunately, the degree to
 which these are properly randomized varies considerably across devices, with
-many devices not implementing strong privacy protections. See this paper for an
+many devices not implementing strong privacy protections. See 
+[this paper](https://arxiv.org/pdf/2003.11511.pdf) for an
 overview on privacy issues. In all cases, the duration for which a CEN lasts
 should be a multiple of the frequency with which MAC address and other
 identifiers in the BLE protocol get randomized. For example, if the MAC address
