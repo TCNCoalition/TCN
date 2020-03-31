@@ -1,38 +1,92 @@
 # CEN Protocol
 
-This is a work-in-progress document.  So far, it just has copies of text from
-various Google Docs, Slack threads, etc., to provide a single source of truth
-to iterate the specification.
+> This is a work-in-progress document.  So far, it just has copies of text from
+> various Google Docs, Slack threads, etc., to provide a single source of truth
+> to iterate the specification.
 
-## Introduction and goals
+**XXX** Add a paragraph to the beginning with a BLUF summary.
 
-Contact tracing is used to identify exposures to a contagion and allow
-treatment, isolation, or quarantine. This document describes the security
-considerations for a protocol on mobile devices that uses a phone’s ability to
-broadcast short range radio announcements (via Bluetooth) to support contact
-tracing and notification while preventing users from being stalked, tracked,
-blackmailed, or otherwise suffering from the exposure of their detailed
-location history to the public. 
+Contact tracing is used to identify people who may have been exposed to
+infection and notify them of their exposure, allowing isolation, testing, or
+treatment as may be appropriate.  However, contact tracing poses risks of its
+own, such as fear of stigma or discrimination based on health status, or the
+risk that contact tracing systems could be repurposed for surveillance by
+governments or individuals.
 
-A contact tracing protocol should allow a user Alice to 
+This document describes a protocol for mobile devices that aims to support
+contact tracing with minimal risk and without requiring trust in a centralized
+party.  No personally-identifiable information is required by the protocol.
+Users' devices send short-range broadcasts over Bluetooth to nearby devices.
+Later, a user who develops symptoms or tests positive can report their status
+to their contacts with minimal loss of privacy.  Users who do not send reports
+reveal no information.
 
-1. Record her contacts, termed contact events, with other app users locally on
-   her own device;
+**XXX** Fill in the rest of this introduction with an overview of the document's contents
 
-2. At a later time notify those users she has had contact with that she has
-   tested positive (or in the case of CoEpi that she has symptoms). 
+## Trust assumptions in contact tracing systems
 
-As the app is always on and continuously broadcasting, this could easily reveal
-a user's entire location history. Preventing this requires a strong security
-model. In particular, no one (even app users themselves) should learn anything
-about anyone else they contact if there are no positive reports. Furthermore,
-to facilitate adoption, no personal identifying information should be collected
-by the app. In the event of a positive test (respectively self-reported
-symptoms), the privacy impact should a) only be on the person reporting and b)
-be as minimal as possible. This is crucial to facilitating adoption and
-complying with various regulations across states and countries.
+**XXX** This should exist in some form but I'm not sure where.
 
-## Straw man solution:
+1.  **Location Privacy**.  Is any party trusted with user's location data, and
+    if so, under what circumstances?
+
+2.  **Functional Capacity**.  Does the system trust that health authorities
+    will be able to carry out their functions, or is it resilient in case they
+    become overwhelmed and are unable to?
+
+3.  **Report Integrity**.  What measures does the system use, if any, to
+    determine the integrity of a report of symptoms or test status?
+
+The CEN protocol does not require trust related to location data, and it also
+does not require participation by a health authority.  Any contact tracing
+protocol that does not require participation by a health authority is
+effectively a particular kind of anonymous messaging protocol, which allows
+users to send reports to all users whom they may have come in contact with
+without revealing their identity.  Leaving the question of report integrity as
+an application-level concern means that different applications can make
+different choices, while still remaining interoperable.  For instance, CoEpi
+allows users to self-report symptoms, while CovidWatch trusts a health
+authority to attest to the integrity of a positive test status.
+
+**XXX** Insert comparisons with other protocols.
+
+## Ideal functionality for contact tracing protocols
+
+The protocol's interactions should fit into the following phases:
+
+- **Broadcast**: users generate and broadcast Contact Event Numbers (CENs) over
+  Bluetooth to nearby devices.
+- **Report**: a user uploads a packet of data to a server to send a report to
+  all users they may have encountered in some time interval.
+- **Scan**: users monitor data published by the server to learn whether they
+  have received any reports.
+- **Fetch**: users who learn of a report addressed to them can download it.
+  - **XXX** Adding this as a separate step would make the protocol much more
+    extensible.  The alternative would be to include the message in the data
+    published by the server, but this maybe requires all clients to be able to
+    parse messages and if the message contents are longer than a message ID,
+    it's less bandwidth efficient.  For the current CoEpi design, this is
+    probably not important, but it will probably not be possible to change the
+    protocol if it is widely deployed, so this may be the only chance to add
+    extensibility.
+
+The protocol should have the following properties:
+
+- **Server Privacy**: An honest-but-curious server should not learn information
+  about any user's location or contacts.
+- **Locality Integrity**: Users cannot send reports to users they did not come
+  in contact with.
+- **No Passive Tracking**: A passive adversary monitoring Bluetooth connections
+  should not be able to learn any information about the location of users who
+  do not send reports.
+- **Reporter Privacy**: Users who send reports do not reveal information to
+  users they did not come in contact with, and reveal only the time of contact
+  to users they did come in contact with.  Note that in practice, the timing
+  alone may still be sufficient for their contact to learn their identity
+  (e.g., if their contact was only around one other person at the time), but
+  this seems like the strongest possible notion of reporter privacy.
+
+## A strawman protocol
 
 All mobile devices running the app periodically generate a random Contact Event
 Number (CEN), store the CEN, and broadcast it using Bluetooth. At the same
