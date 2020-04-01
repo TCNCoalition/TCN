@@ -345,6 +345,54 @@ between different platforms, but the process of communicating CENs between
 platforms has been reduced to working implementations in the above
 repositories.
 
+## CEN Reporting
+
+Given a specific choice of H, the above reduces to a CEN Report with less than
+1K per report, using JSON Object serialization/deserialization:
+
+```
+    report: ByteArray       // TBD based on Symptoms / Infections bits, considered in second
+    reportMetadata: String  // TBD, to support different kinds of reports, could be MIME type
+    L: String,     // short label L from CenKey. [hexadecimal form, 64 chars]
+    key: String,   // Key_{j-1}.                 [hexadecimal form, 64 chars]
+    j : Int,       // initial period j
+    jMax : Int     // number of periods
+```
+
+To maximize transparency, we will use an “infrastructure as code” using AWS’s
+S3 API (could be DynamoDB, or another cloud provider, e.g. GC gcloud) instead
+of a CEN API hosted by servers run by application developers.  The core
+reasoning for this:
+
+1.  Trust for AWS’s S3 (and other services such as Azure, Google Cloud,
+    Alibaba, and many similar data storage services) will be higher than any
+    special purpose code.  Similar services of DynamoDB, RDS may have identical
+    or higher throughput properly.  Latency is not a serious concern, but
+    widespread availability ala CDN properties would be extremely desirable.
+2.  Extremely wide community support and knowledge for AWS S3 (and similiar
+    services) implies that a very large number of cloud provider experts can
+    understand the system solely from a logging point of view.
+
+CEN Clients will then write/read:
+* **CEN Report Writes.** Write to a bucket endpoint with a new log line.   For
+  geohash support, set up geohash-specific folders within the bucket: Clients
+  will write to the longest bucket prefix that covers all the geohashes
+  visited, e.g. someone who has been in geohashes ABCDE and ABDEF will write to
+  bucket AB.
+* **CEN Report Reads.**  Read from a time-based log system.  For geohash
+  support, read from all bucket prefixes the user has been to, e.g. someone who
+  someone who has been to ABXYZ and ABIJK will read from buckets A, AB, ABXYZ,
+  ABIJK.
+
+Configurations for the bucket provider:
+1.  CDN support.  Adjust the above so the logs can be received + replicated all
+    over the world instead of sitting in one region
+2.  DDOS support.
+3.  Add permissioning mechanism to bucket configurations with iOS
+    DeviceCheck/SafetyNet ReCAPTCHA such that log append of CEN Reports can
+    only from those users that pass the checks; if not, add middleware
+    component to accomplish this
+
 ## Contributors
 
 - Sourabh Niyogi <sourabh@wolk.com>,
