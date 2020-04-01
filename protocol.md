@@ -295,9 +295,9 @@ with the report. Others accept if the signature is valid under the included `vk`
 In this scheme the health authorities or anyone else can check the signed
 record, and do not have to be trusted to mitigate impersonation.
 
-### Attacks
+## Attacks
 
-#### Linkage Attack
+### Linkage Attack
 A [linkage attack](https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
 is the matching of anonymized records with non-anonymized records in a different
 dataset. An example for our usecase would be: A user is only close to one other
@@ -307,6 +307,43 @@ do out of band correlation, like taking notes/pictures, they can narrow down the
 possible real identies of their contacts, which revealed. As long as the users
 know which CENs are in the intersection, this can not be prevented.
 
+## CEN sharing with Bluetooth Low Energy
+
+Applications following this protocol are based on iOS and Android applications
+capability to broadcast a 128-bit Contact Event Number (CEN) using Bluetooth
+Low Energy.  Current prototype implementations are using the following service
+UUID and characteristic UUID:
+```
+service UUID = "BC908F39-52DB-416F-A97E-6EAC29F59CA8"
+characteristic: UUID = "2ac35b0b-00b5-4af2-a50e-8412bcb94285"
+```
+Each device (Central) scans its environment and finds another device
+(Peripheral) with the same service UUID, finding CEN in either the
+Characteristic or ServiceData field.  Energy considerations may guide protocol
+design so that scan frequencies are kept reasonable.  There are 4 key flows
+between a Central device `C` that finds a peripheral device `P`:
+
+| Central (C) | Peripheral (P) | How the Contact Event Number (CEN) Is Found |
+|-------------|----------------|---------------------------------------------|
+| iOS | iOS | C connects to P and retrieves the value of the characteristic |
+| Android | Android | C reads P’s CEN from the ServiceData field of the Service Advertisement broadcast.  Frequency of changing the CEN: as often as the BLE stack and the OS will allow without getting mad at us (every 15mins, every min, every second?).  |
+| iOS | Android | C connects to P and retrieves the value of the characteristic.  |
+| Android | iOS | This combination does not appear!  For an Android device to receive a CEN from an iOS device, the iOS device connects as central and writes the value of a characteristic (not sure if it can be the same characteristic UUID or should be different).  |
+
+Current open source implementations (MIT License) from CoEpi + COVID-Watch
+generating CENs locally and covering the communication for each of the above 4
+key flows are being developed in the following repositories:
+
+* https://github.com/Co-Epi/app-android
+* https://github.com/Co-Epi/app-ios
+* https://github.com/covid19risk/covidwatch-ios
+* https://github.com/covid19risk/covidwatch-android
+* [if you have a repository, please file a PR to add it here]
+
+It is expected that the process to generate the 128-bit CEN will not vary
+between different platforms, but the process of communicating CENs between
+platforms has been reduced to working implementations in the above
+repositories.
 
 ## Contributors
 
