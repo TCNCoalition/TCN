@@ -74,17 +74,21 @@ The protocol should have the following properties:
 
 - **Server Privacy**: An honest-but-curious server should not learn information
   about any user's location or contacts.
-- **Locality Integrity**: Users cannot send reports to users they did not come
-  in contact with.
+- **Source Integrity**: Users cannot send reports to users they did not come
+  in contact with or on behalf of other users.
 - **No Passive Tracking**: A passive adversary monitoring Bluetooth connections
   should not be able to learn any information about the location of users who
   do not send reports.
-- **Reporter Privacy**: Users who send reports do not reveal information to
-  users they did not come in contact with, and reveal only the time of contact
-  to users they did come in contact with.  Note that in practice, the timing
-  alone may still be sufficient for their contact to learn their identity
-  (e.g., if their contact was only around one other person at the time), but
-  this seems like the strongest possible notion of reporter privacy.
+- **Receiver Privacy**: Users who receive reports do not reveal information to
+  anyone.
+- **Weak Reporter Privacy**: Users who send reports do not reveal information
+  to users they did not come in contact with, and reveal only the time of
+  contact to users they did come in contact with.  Note that in practice, the
+  timing alone may still be sufficient for their contact to learn their
+  identity (e.g., if their contact was only around one other person at the
+  time).
+
+**XXX** It may be possible / better to merge this with the section above.
 
 ## A strawman protocol
 
