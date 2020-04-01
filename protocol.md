@@ -307,6 +307,14 @@ do out of band correlation, like taking notes/pictures, they can narrow down the
 possible real identies of their contacts, which revealed. As long as the users
 know which CENs are in the intersection, this can not be prevented.
 
+### Replay Attack
+An attacker collects CENs of others and rebroadcasts them, to impersonate another
+user during the gossip phase. If not mitigated, they can at most produce as many
+false positives as they could with an illegitimate reveal (i.e. they are not
+infected). Since in the above proposal, the validity period of a CEN will be known 
+after a reveal, this attack can only be executed in a short timeframe.
+
+
 ## CEN sharing with Bluetooth Low Energy
 
 Applications following this protocol are based on iOS and Android applications
