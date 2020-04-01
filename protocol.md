@@ -306,3 +306,17 @@ know who it was. Generally: If the timeframe of a contact is revealed, and users
 do out of band correlation, like taking notes/pictures, they can narrow down the
 possible real identies of their contacts, which revealed. As long as the users
 know which CENs are in the intersection, this can not be prevented.
+
+
+## Contributors
+
+- Sourabh Niyogi <sourabh@wolk.com>,
+- James Petrie,
+- Scott Leibrand,
+- Jack Gallagher,
+- Hamish,
+- Manu Eder <manulari@posteo.eu>,
+- Zsombor Szabo,
+- George Danezis (UCL),
+- Ian Miers,
+- Henry de Valence <hdevalence@hdevalence.ca>,
