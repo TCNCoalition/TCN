@@ -295,9 +295,9 @@ with the report. Others accept if the signature is valid under the included `vk`
 In this scheme the health authorities or anyone else can check the signed
 record, and do not have to be trusted to mitigate impersonation.
 
-### Attacks
+## Attacks
 
-#### Linkage Attack
+### Linkage Attack
 A [linkage attack](https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
 is the matching of anonymized records with non-anonymized records in a different
 dataset. An example for our usecase would be: A user is only close to one other
