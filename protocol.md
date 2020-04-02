@@ -236,23 +236,24 @@ capability to broadcast a 128-bit Contact Event Number (CEN) using Bluetooth
 Low Energy.  Current prototype implementations are using the following service
 UUID and characteristic UUID:
 ```
-service UUID = "BC908F39-52DB-416F-A97E-6EAC29F59CA8"
-characteristic: UUID = "2ac35b0b-00b5-4af2-a50e-8412bcb94285"
+service UUID = "C019"
+characteristic UUID = "D61F4F27-3D6B-4B04-9E46-C9D2EA617F62"
 ```
 Each device (Central) scans its environment and finds another device
 (Peripheral) with the same service UUID, finding CEN in either the
 Characteristic or ServiceData field.  Energy considerations may guide protocol
-design so that scan frequencies are kept reasonable.  There are 4 key flows
-between a Central device `C` that finds a peripheral device `P`:
+design so that scan frequencies are kept reasonable.  There are 4 key flows:
 
-| Central (C) | Peripheral (P) | How the Contact Event Number (CEN) Is Found |
+|  |  | How the Contact Event Number (CEN) Is Found |
 |-------------|----------------|---------------------------------------------|
-| iOS | iOS | C connects to P and retrieves the value of the characteristic |
-| Android | Android | C reads P’s CEN from the ServiceData field of the Service Advertisement broadcast.  Frequency of changing the CEN: as often as the BLE stack and the OS will allow without getting mad at us (every 15mins, every min, every second?).  |
-| iOS | Android | C connects to P and retrieves the value of the characteristic.  |
-| Android | iOS | This combination does not appear!  For an Android device to receive a CEN from an iOS device, the iOS device connects as central and writes the value of a characteristic (not sure if it can be the same characteristic UUID or should be different).  |
+| iOS Central (C) | iOS Peripheral (P) | Central (C) connects to Peripheral (P) and reads the value of the characteristic. |
+| Android (1) | Android (2) | 1 reads 2’s CEN from the ServiceData field of the Service Advertisement broadcast. Frequency of changing the CEN is 15 minutes.  |
+| iOS (1) | Android (2) | This combination is equivalent to the Android-Android one from above.  |
+| Android (1) | iOS (2) | To avoid using GATT client code on Anroid, for an Android device to receive a CEN from an iOS device, the iOS device connects as central and writes the value of the characteristic.  |
 
-Current open source implementations (MIT License) from CoEpi + COVID-Watch
+To work around the background discoverability issue on iOS, where two iOS devices can't discover each other if both are sleeping, Android devices act as a "bridge" and broadcast the CENs they receive via the characteristic write operation (4th combination from above).
+
+Current open source implementations (MIT License) from CoEpi + CovidWatch
 generating CENs locally and covering the communication for each of the above 4
 key flows are being developed in the following repositories:
 
