@@ -1,34 +1,31 @@
 # CEN Protocol
 
-> This is a work-in-progress document.  So far, it just has copies of text from
-> various Google Docs, Slack threads, etc., to provide a single source of truth
-> to iterate the specification.
+> This is a work-in-progress document.
 
-**XXX** Add a paragraph to the beginning with a BLUF summary.
+This document describes **Contact Event Numbers**, a decentralized,
+privacy-preserving contact tracing protocol developed by [CoEpi] and
+[CovidWatch]. No personally-identifiable information is required by the
+protocol, and although it is compatible with a trusted health authority, it
+does not require one. Users' devices send short-range broadcasts over
+Bluetooth to nearby devices. Later, a user who develops symptoms or tests
+positive can report their status to their contacts with minimal loss of
+privacy. Users who do not send reports reveal no information. Different
+applications using the CEN protocol can interoperate, and the protocol can be
+used with either verified test results or for self-reported symptoms via an
+extensible report memo field.
 
-Contact tracing is used to identify people who may have been exposed to
-infection and notify them of their exposure, allowing isolation, testing, or
-treatment as may be appropriate.  However, contact tracing poses risks of its
-own, such as fear of stigma or discrimination based on health status, or the
-risk that contact tracing systems could be repurposed for surveillance by
-governments or individuals.
+**XXX** Fill in the rest of this introduction with an overview of the document's contents.
 
-This document describes a protocol for mobile devices that aims to support
-contact tracing with minimal risk and without requiring trust in a centralized
-party.  No personally-identifiable information is required by the protocol.
-Users' devices send short-range broadcasts over Bluetooth to nearby devices.
-Later, a user who develops symptoms or tests positive can report their status
-to their contacts with minimal loss of privacy.  Users who do not send reports
-reveal no information.
+## Ideal functionality and trust assumptions in contact tracing systems
 
-**XXX** Fill in the rest of this introduction with an overview of the document's contents
+Cryptography builds systems that mediate and rearrange trust, so before
+beginning discussion of cryptographic approaches to contact tracing, it's
+worthwhile to delineate categories of trust involved in the problem.
 
-## Trust assumptions in contact tracing systems
-
-**XXX** This should exist in some form but I'm not sure where.
-
-1.  **Location Privacy**.  Is any party trusted with user's location data, and
-    if so, under what circumstances?
+1.  **Location Privacy**.  Is any party trusted with access to location data,
+    and if so, under what circumstances?  Because a contact tracing system
+    allows users to report potential exposure to other users, this category can
+    be usefully subdivided into *reporter privacy* and *receiver privacy*.
 
 2.  **Functional Capacity**.  Does the system trust that health authorities
     will be able to carry out their functions, or is it resilient in case they
@@ -37,22 +34,44 @@ reveal no information.
 3.  **Report Integrity**.  What measures does the system use, if any, to
     determine the integrity of a report of symptoms or test status?
 
-The CEN protocol does not require trust related to location data, and it also
-does not require participation by a health authority.  Any contact tracing
-protocol that does not require participation by a health authority is
-effectively a particular kind of anonymous messaging protocol, which allows
-users to send reports to all users whom they may have come in contact with
-without revealing their identity.  Leaving the question of report integrity as
-an application-level concern means that different applications can make
-different choices, while still remaining interoperable.  For instance, CoEpi
-allows users to self-report symptoms, while CovidWatch trusts a health
-authority to attest to the integrity of a positive test status.
+Contact tracing is used to identify people who may have been exposed to
+infection and notify them of their exposure, allowing isolation, testing, or
+treatment as may be appropriate.  However, contact tracing poses risks of its
+own, such as fear of stigma or discrimination based on health status, or the
+risk that contact tracing systems could be repurposed for surveillance by
+governments or individuals.  This makes location privacy paramount.
 
-**XXX** Insert comparisons with other protocols.
+**XXX** Add note explaining why the other categories are under-appreciated, and
+why the protocol does not require a centralized authority.
 
-## Ideal functionality for contact tracing protocols
+However, trust in functional capacity is also problematic. In an ideal world,
+health authorities would have unlimited resources and perfect effectiveness
+in deploying them. But in the real world, health authorities have limited
+resources, are strained under the burden of dealing with the epidemic, or may
+fail to respond adequately or effectively. Indeed, each of these
+possibilities has already happened during the current epidemic. While no
+technological system can properly compensate for institutional failure, a
+system that is resilient to failure can potentially absorb slack and give
+people agency to help themselves.
 
-The protocol's interactions should fit into the following phases:
+Moreover, a protocol that places additional burdens on health authorities
+(e.g., requiring them to deploy complex cryptography like MPC or carefully
+manage cryptographic key material) faces severe adoption barriers to one that
+does not, so reducing trust requirements may allow accelerated deployment.
+
+For these reasons, it seems preferable to design a protocol that does not
+require participation by any health authority, but is optionally compatible
+with health authorities that verify report integrity (e.g., by sending
+reports to a portal that signs them on behalf of the health authority).
+Leaving the question of report integrity as an application-level concern
+means that different applications can make different choices, while still
+remaining interoperable. For instance, [CoEpi] allows users to self-report
+symptoms, while [CovidWatch] trusts a health authority to attest to the
+integrity of a positive test status.
+
+This analysis lets us describe the structure and ideal functionality of a
+contact tracing protocol. The protocol's interactions should fit into the
+following phases:
 
 - **Broadcast**: users generate and broadcast Contact Event Numbers (CENs) over
   Bluetooth to nearby devices.
@@ -60,47 +79,46 @@ The protocol's interactions should fit into the following phases:
   all users they may have encountered in some time interval.
 - **Scan**: users monitor data published by the server to learn whether they
   have received any reports.
-- **Fetch**: users who learn of a report addressed to them can download it.
-  - **XXX** Adding this as a separate step would make the protocol much more
-    extensible.  The alternative would be to include the message in the data
-    published by the server, but this maybe requires all clients to be able to
-    parse messages and if the message contents are longer than a message ID,
-    it's less bandwidth efficient.  For the current CoEpi design, this is
-    probably not important, but it will probably not be possible to change the
-    protocol if it is widely deployed, so this may be the only chance to add
-    extensibility.
 
-The protocol should have the following properties:
+Ideally, the protocol should have the following properties:
 
 - **Server Privacy**: An honest-but-curious server should not learn information
   about any user's location or contacts.
 - **Source Integrity**: Users cannot send reports to users they did not come
   in contact with or on behalf of other users.
+- **Broadcast Integrity**: Users cannot broadcast CENs they did not generate.
 - **No Passive Tracking**: A passive adversary monitoring Bluetooth connections
   should not be able to learn any information about the location of users who
   do not send reports.
 - **Receiver Privacy**: Users who receive reports do not reveal information to
   anyone.
-- **Weak Reporter Privacy**: Users who send reports do not reveal information
+- **Reporter Privacy**: Users who send reports do not reveal information
   to users they did not come in contact with, and reveal only the time of
   contact to users they did come in contact with.  Note that in practice, the
   timing alone may still be sufficient for their contact to learn their
   identity (e.g., if their contact was only around one other person at the
   time).
 
-**XXX** It may be possible / better to merge this with the section above.
+Of these properties, broadcast integrity is very difficult to achieve,
+because it requires authentication at the physical layer to prevent a user
+from rebroadcasting CENs they observed from other users. However, the attack
+it prevents is one where an adversary creates ghostly copies of legitimate
+users, and this attack requires the adversary to go around with devices, so
+it does not scale well. In what follows, we do not attempt to achieve
+broadcast integrity.
 
 ## A strawman protocol
 
-As a first attempt to formulate a protocol that satisfies these properties, we
-consider a strawman protocol.  All mobile devices running the app periodically
-generate a random CEN, store the CEN, and broadcast it using Bluetooth. At the
-same time, the app also listens for and records the CENs generated by other
-devices.  To send a report, the user (or a health authority acting on their
-behalf) uploads the CENs she generated to a server.  All users' apps
-periodically download the list of reported CENs, then compare it with the list
-of CENs they observed and recorded locally. The intersection of these two lists
-is the set of positive contacts.
+As a first attempt to formulate a protocol that satisfies these properties,
+we consider a strawman protocol. All mobile devices running the app
+periodically generate a random CEN, store the CEN, and broadcast it using
+Bluetooth. At the same time, the app also listens for and records the CENs
+generated by other devices. To send a report, the user (or a health authority
+acting on their behalf) uploads the CENs she generated to a server, together
+with a memo field containing application-specific report data. All users'
+apps periodically download the list of reported CENs, then compare it with
+the list of CENs they observed and recorded locally. The intersection of
+these two lists is the set of positive contacts.
 
 Intuitively, this provides server privacy, as the server only observes a list
 of random numbers, and cannot correlate them with users or locations without
@@ -111,28 +129,161 @@ reported CENs and process it locally.  And if the list of CENs is batched
 appropriately, users who send reports do not leak information beyond the time
 of contact to users who observed the CENs.
 
-However, this proposal does not provide source integrity.  Because CENs have no
-structure, nothing prevents a user from observing the CENs broadcast by another
-user and then including them in a report to the server.  Notice that this is
-still a problem even in the setting where a health authority verifies reports,
-because although they can attest to test results, they have no way to verify
-the CENs.  It also poses scalability issues, because all users must download
-the entire list of reported CENs.
+However, this proposal does not provide source integrity. Because CENs have
+no structure, nothing prevents a user from observing the CENs broadcast by
+another user and then including them in a report to the server. Notice that
+this is still a problem even in the setting where a health authority verifies
+reports, because although they can attest to test results, they have no way
+to verify the CENs. It also poses scalability issues, because the report
+contains a list of every CEN the user broadcast over the reporting period,
+and all users must download all reports.
 
-Both of these issues can be addressed by deriving CENs differently, as
-described below.
+## The CEN Protocol
 
-## Compressing CEN uploads for scalability:
+To address the scalability issue, we change from purely random CENs to CENs
+deterministically generated from some seed data. This reduces the size of the
+report, because it can contain only the compact seed data rather than the
+entire list of CENs. This change trades scalability for reporter privacy,
+because CENs derived from the same report are linkable to each other.
+However, this linkage is only possible by parties that have observed multiple
+CENs from the same report, not by all users. Distinct reports are not
+linkable, so users can submit multiple partial reports rather than a single
+report for their entire history. The report rotation frequency adjusts the
+tradeoff between reporter privacy and scalability.
 
-To ensure scalability, we upload a compressed representation of all the CENs a
-user generates. To do this, we use cryptography to generate the entire sequence
-of CENs for a user from a short key. As a result, a single 128 bit key can be
-used to represent all CENs a user will ever generate. The exact method of
-deriving keys is currently under discussion, but there are multiple feasible
-approaches and it is simply a matter of picking one. Provided the CEN are
-cryptographically pseudorandom, the particular properties of the generation
-process should not affect security, but it may affect scalability.The existing
-designs are detailed here and here.
+To address the source integrity issue, we additionally bind the derived CENs
+to a secret held by the user, and require that they prove knowledge of that
+secret when submitting a report. This proof (in the form of a digital
+signature) can be relayed to other users for public verifiability, or checked
+only by the server.
+
+**Report Key Generation**. The user-agent creates the *report authorization
+*key* `rak` and the *report verification key* `rvk` as the signing and
+verification keys of a signature scheme.
+Then it computes the initial *contact event key (CEK)* as
+```
+cek_0 ← H_cek(rak).
+```
+Each report can contain at most `2**16` CENs. `H_cek` is a domain-separated
+hash function with 256 bits of output.
+
+**CEK Ratchet**. Contact event keys support a *ratchet* operation:
+```
+cek_i ← H_cek(rvk || cek_{i-1}).
+```
+As noted below, it is crucial that CEK ratchet is synchronized with MAC
+rotation at the Bluetooth layer to prevent linkability attacks.
+
+**CEN Generation**. A contact event number is derived from a contact event 
+key by computing
+```
+cen_i ← H_cen(le_u16(i) || cek_i),
+```
+where `H_cen` is a domain-separated hash function with 128 bits of output.
+
+**Report Generation**. 
+A user wishing to notify contacts they encountered over the period `j1` to `j2`
+prepares a report as
+```
+report ← rvk || cek_{j1} || le_u16(j1) || le_u16(j2) || memo
+```
+where `memo` is a variable-length bytestring 2-258 bytes long whose structure
+is described below. Then they use `rsk` to produce `sig`, a signature over
+`report`, and send `report || sig` to the server.
+
+**Report Check**.
+Anyone can verify the source integity of the report by checking `sig` over
+`report` using the included `rvk`, recompute the CENs as
+```
+cen_j1 ← H_cen(le_u16(j1) || cek_{j1})
+cek_{j1+1} ← H_cek(rvk || cek_{j1})
+cen_{j1+1} ← H_cen(le_u16(j1+1) || cek_{j1+1})
+...
+```
+and compare the recomputed CENs with their observations. The server can
+optionally strip the trailing 64 byte `sig` from each report if client
+verification is not important.
+
+**Memo Structure**.
+The memo field provides a compact space for freeform messages. This ensures
+that the protocol is application-agnostic and extensible. For instance, the
+memo field could contain a bitflag describing self-reported symptoms, in the
+case of [CoEpi], or a signature verifying test results, in the case of
+[CovidWatch].
+
+The memo field is between 2 and 258 bytes and has the following structure:
+```
+len: u8 || type: u8 || data: [u8; len]
+```
+The `type` field has the following meaning:
+- `0x0`: CoEpi symptom report v1;
+- `0x1`: CovidWatch test result v1;
+- `0x2-0xfe`: reserved for allocations to applications on request;
+- `0xff`: reserved (can be used to add more than 256 types later).
+
+**Parameter Choices**. We implement 
+* `H_cek` using SHA256 with domain separator `b"H_CEK"`;
+* `H_cen` using SHA256 with domain separator `b"H_CEN"`;
+* `rak` and `rvk` as the signing and verification keys of Ed25519.
+
+These parameter choices result in signed reports of 134-390 bytes or unsigned
+reports of 70-326 bytes, depending on the length of the memo field.
+
+## CEN sharing with Bluetooth Low Energy
+
+Applications following this protocol are based on iOS and Android applications
+capability to broadcast a 128-bit Contact Event Number (CEN) using Bluetooth
+Low Energy.  Current prototype implementations are using the following service
+UUID and characteristic UUID:
+```
+service UUID = "BC908F39-52DB-416F-A97E-6EAC29F59CA8"
+characteristic: UUID = "2ac35b0b-00b5-4af2-a50e-8412bcb94285"
+```
+Each device (Central) scans its environment and finds another device
+(Peripheral) with the same service UUID, finding CEN in either the
+Characteristic or ServiceData field.  Energy considerations may guide protocol
+design so that scan frequencies are kept reasonable.  There are 4 key flows
+between a Central device `C` that finds a peripheral device `P`:
+
+| Central (C) | Peripheral (P) | How the Contact Event Number (CEN) Is Found |
+|-------------|----------------|---------------------------------------------|
+| iOS | iOS | C connects to P and retrieves the value of the characteristic |
+| Android | Android | C reads P’s CEN from the ServiceData field of the Service Advertisement broadcast.  Frequency of changing the CEN: as often as the BLE stack and the OS will allow without getting mad at us (every 15mins, every min, every second?).  |
+| iOS | Android | C connects to P and retrieves the value of the characteristic.  |
+| Android | iOS | This combination does not appear!  For an Android device to receive a CEN from an iOS device, the iOS device connects as central and writes the value of a characteristic (not sure if it can be the same characteristic UUID or should be different).  |
+
+Current open source implementations (MIT License) from CoEpi + COVID-Watch
+generating CENs locally and covering the communication for each of the above 4
+key flows are being developed in the following repositories:
+
+* https://github.com/Co-Epi/app-android
+* https://github.com/Co-Epi/app-ios
+* https://github.com/covid19risk/covidwatch-ios
+* https://github.com/covid19risk/covidwatch-android
+* [if you have a repository, please file a PR to add it here]
+
+It is expected that the process to generate the 128-bit CEN will not vary
+between different platforms, but the process of communicating CENs between
+platforms has been reduced to working implementations in the above
+repositories.
+
+## Contributors
+
+- Sourabh Niyogi <sourabh@wolk.com>,
+- James Petrie,
+- Scott Leibrand,
+- Jack Gallagher,
+- Hamish,
+- Manu Eder <manulari@posteo.eu>,
+- Zsombor Szabo,
+- George Danezis (UCL),
+- Ian Miers,
+- Henry de Valence <hdevalence@hdevalence.ca>,
+
+[CoEpi]: https://www.coepi.org/
+[CovidWatch]: https://www.covid-watch.org/
+
+# Notes (to be merged with main document)
 
 ## Key rotation and compression factor:
 
@@ -216,133 +367,6 @@ would not. Anyone observing (MAC A, CEN 1), then (MAC B, CEN 1), then (MAC B,
 CEN 2) can conclude they are all the same device because all identifiers don’t
 change at the same time. This would entirely compromise Bluetooth privacy. 
 
-## George Danezis proposal of 3/27/20
-
-Builds on prior work from CoEpi (?)
-
-The following CEN derivation function employs only a secure cryptographic hash function `H`:
-
-### CEN Key Derivation
-
-#### CEN Key Generation Initialization.  
-
-The app would initialize the CEN generator with:
-- `S`, a secret nonce, of at least 128 bits (optionally a public verification key `vk` from a signature scheme, with the corresponding signing key `sk` remaining always secret);
-- `L = H(S)`, a short label;
-- `K_0`, a fresh secret key for the session. (A session ends when a report of an infection is filled).
-
-#### CEN Key Generation.  
-
-For each period `i`, the key would be updated:
-```
-K_i ← H(K_{i-1}, L)
-```
-
-#### CEN Broadcast.  
-
-For each period `i`, CENs would be derived as
-```
-CEN_i = H(K_i, period_i)
-```
-where `period_i` is an integer denoting the period for the `CEN_i`.
-
-### Operations
-
-#### Reveal
-
-Upon a positive diagnosis, the app broadcasts to a health authority database:
-the short label `L`, a key `K_{j-1}`, and the initial period `j` and number of
-periods `j_max`. Other application users download `K_{j-1}`, `j`, and `j_max`,
-and can compute all subsequent `K_j` and `CEN_j`s and compare them with the
-ones seen on the phone.  The comparison here is purely string comparison, and
-therefore efficient string search algorithms can be used on the phone. The
-period the CEN was active can also be compared with the time a CEN was observed
-to protect against replayed CENs from the past.  
-
-#### Delete
-
-After some days are past (with no symptoms), older
-versions of the key before Ki can be deleted, making the link of the phone with
-older CENs unrecoverable.
-
-### Discussion
-
-The advantage of the above over the proposals below is:
-
-Given a new Ki the operation on the phone to match its associated CENs with
-local observed CENs is efficient. There are 2x periods applications of a hash
-function, and then only string matching – which is efficient through indexing. 
-
-**Mitigating impersonation**: The key leverage you have is the trusted health
-worker that supervises the positive test, and enables the contact tracing alert
-(that broadcasts key `K_i` to derive CENs).  How can the protocol assist the
-health worker (and its app) to ensure that reported CENs / `K_i`s are not
-impersonations?
-
-**Central admission control setting**: Since `L = H(S)`, where `S` is a secret
-nonce, the app can prove to the healthcare worker that it generated the keys `K_i`
-by revealing `S`.  However, if someone merely observes `K_i` and `L` (as part of the
-contract tracing protocol), they cannot extract `S` and therefore cannot convince
-any health workers to include the `K_i`/CENs they are merely relaying. This relies
-on the honesty of health workers to check `L = H(S)` and not reveal the `S`
-provided.
-
-**Public verifiability**: If we set `S = vk` for `vk` for a `(vk, sk)` key pair, with
-`sk` only known to the user reporting, then we can include a signature in the
-report to prevent others impersonating the CENs and including them in their
-report. In that scheme we provide a signature on `(S = vk, L, Kj-1, j-1, j_max)`
-with the report. Others accept if the signature is valid under the included `vk`.
-In this scheme the health authorities or anyone else can check the signed
-record, and do not have to be trusted to mitigate impersonation.
-
-## Modified proposal
-
-Roughly, we replace `S` and `L` by the signing and verification keys of a
-signature scheme.
-
-**XXX** Remove the description above after initial review of the new description.
-
-The app creates `rak` (the *report authorization key*) and `rvk` (the *report
-verification key*) as the signing and verification keys of a signature scheme.
-Then it computes the initial *contact event key (CEK)* as
-```
-cek_0 ← H_cek(rak).
-```
-Contact event keys support a *ratchet* operation:
-```
-cek_i ← H_cek(rvk || cek_{i-1}).
-```
-A *contact event number (CEN)* is derived from the contact event key by computing
-```
-cen_i ← H_cen(le_u16(i) || cek_i).
-```
-Note that each report authorization key can create at most `2**16` CENs.  In
-practice, reports should be rotated more frequently.
-
-A user wishing to notify contacts they encountered over the period `j1` to `j2`
-prepares a report as
-```
-report ← rvk || cek_{j1} || le_u16(j1) || le_u16(j2) || memo
-```
-where `memo` is a variable-length bytestring with the following structure:
-```
-len: u8 || type: u8 || data: [u8; len]
-```
-Then they use `rsk` to produce `sig`, a signature over `report`, and send
-`report || sig` to the server.
-
-Anyone can verify the source integity of the report by checking `sig` over
-`report` using the included `rvk`, and recompute the CENs as
-```
-cen_j1 ← H_cen(le_u16(j1) || cek_{j1})
-cek_{j1+1} ← H_cek(rvk || cek_{j1})
-cen_{j1+1} ← H_cen(le_u16(j1+1) || cek_{j1+1})
-...
-```
-Using SHA256 and Ed25519, reports are `134-390` bytes each, depending on the
-length of the memo field.  The server can optionally strip the trailing 64 byte 
-`sig` from each report if client verification is not important.
-
 ## Attacks
 
 ### Linkage Attack
@@ -361,55 +385,3 @@ user during the gossip phase. If not mitigated, they can at most produce as many
 false positives as they could with an illegitimate reveal (i.e. they are not
 infected). Since in the above proposal, the validity period of a CEN will be known 
 after a reveal, this attack can only be executed in a short timeframe.
-
-
-## CEN sharing with Bluetooth Low Energy
-
-Applications following this protocol are based on iOS and Android applications
-capability to broadcast a 128-bit Contact Event Number (CEN) using Bluetooth
-Low Energy.  Current prototype implementations are using the following service
-UUID and characteristic UUID:
-```
-service UUID = "BC908F39-52DB-416F-A97E-6EAC29F59CA8"
-characteristic: UUID = "2ac35b0b-00b5-4af2-a50e-8412bcb94285"
-```
-Each device (Central) scans its environment and finds another device
-(Peripheral) with the same service UUID, finding CEN in either the
-Characteristic or ServiceData field.  Energy considerations may guide protocol
-design so that scan frequencies are kept reasonable.  There are 4 key flows
-between a Central device `C` that finds a peripheral device `P`:
-
-| Central (C) | Peripheral (P) | How the Contact Event Number (CEN) Is Found |
-|-------------|----------------|---------------------------------------------|
-| iOS | iOS | C connects to P and retrieves the value of the characteristic |
-| Android | Android | C reads P’s CEN from the ServiceData field of the Service Advertisement broadcast.  Frequency of changing the CEN: as often as the BLE stack and the OS will allow without getting mad at us (every 15mins, every min, every second?).  |
-| iOS | Android | C connects to P and retrieves the value of the characteristic.  |
-| Android | iOS | This combination does not appear!  For an Android device to receive a CEN from an iOS device, the iOS device connects as central and writes the value of a characteristic (not sure if it can be the same characteristic UUID or should be different).  |
-
-Current open source implementations (MIT License) from CoEpi + COVID-Watch
-generating CENs locally and covering the communication for each of the above 4
-key flows are being developed in the following repositories:
-
-* https://github.com/Co-Epi/app-android
-* https://github.com/Co-Epi/app-ios
-* https://github.com/covid19risk/covidwatch-ios
-* https://github.com/covid19risk/covidwatch-android
-* [if you have a repository, please file a PR to add it here]
-
-It is expected that the process to generate the 128-bit CEN will not vary
-between different platforms, but the process of communicating CENs between
-platforms has been reduced to working implementations in the above
-repositories.
-
-## Contributors
-
-- Sourabh Niyogi <sourabh@wolk.com>,
-- James Petrie,
-- Scott Leibrand,
-- Jack Gallagher,
-- Hamish,
-- Manu Eder <manulari@posteo.eu>,
-- Zsombor Szabo,
-- George Danezis (UCL),
-- Ian Miers,
-- Henry de Valence <hdevalence@hdevalence.ca>,
