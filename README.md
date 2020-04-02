@@ -4,7 +4,7 @@
 > and issues.
 
 This document describes **Contact Event Numbers**, a decentralized,
-privacy-preserving contact tracing protocol developed by [CoEpi] and
+privacy-first contact tracing protocol developed by [CoEpi] and
 [CovidWatch]. No personally-identifiable information is required by the
 protocol, and although it is compatible with a trusted health authority, it
 does not require one. Users' devices send short-range broadcasts over
