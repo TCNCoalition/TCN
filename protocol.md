@@ -314,6 +314,10 @@ false positives as they could with an illegitimate reveal (i.e. they are not
 infected). Since in the above proposal, the validity period of a CEN will be known 
 after a reveal, this attack can only be executed in a short timeframe.
 
+## Counting CEN collisions
+With 128 Bit CENs, at a world population of 8bn, expected total collision count for 
+all legitimately generated CENs (revealed and non-revealed), without sharding 
+is ~1.7e-13 (see [`collisions.jl`](./scripts/collisions.jl)).
 
 ## CEN sharing with Bluetooth Low Energy
 
