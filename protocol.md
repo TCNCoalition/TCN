@@ -295,6 +295,49 @@ with the report. Others accept if the signature is valid under the included `vk`
 In this scheme the health authorities or anyone else can check the signed
 record, and do not have to be trusted to mitigate impersonation.
 
+## Modified proposal
+
+Roughly, we replace `S` and `L` by the `sk` and `vk` of a signature scheme.
+
+The app generates signing and verification keys `sk` (the *report authorization
+key*) and `vk` of a signature scheme, and computes the initial CEN key as
+```
+k_0 ← H_k(sk).
+```
+CEN keys are updated by computing
+```
+k_i ← H_k(vk || k_{i-1}).
+```
+CENs are derived from the CEN key by computing
+```
+CEN_i ← H_CEN(le_u16(i) || k_i).
+```
+Note that each report authorization key can create at most `2**16` CENs.
+
+A user wishing to notify contacts they encountered over the period `j1` to `j2`
+prepares a report as
+```
+report ← vk || k_{j1} || le_u16(j1) || le_u16(j2) || memo
+```
+where `memo` is a variable-length bytestring with the following structure:
+```
+len: u8 || type: u8 || data: [u8; len]
+```
+Then they use `sk` to produce `sig`, a signature over `report`, and send
+`report || sig` to the server.
+
+Anyone can verify the source integity of the report by checking `sig` over
+`report` using the included `vk`, and recompute the CENs as
+```
+CEN_j1 ← H_CEN(le_u16(j1) || k_{j1})
+k_{j1+1} ← H_k(vk || k_{j1})
+CEN_{j1+1} ← H_CEN(le_u16(j1+1) || k_{j1+1})
+...
+```
+Using SHA256 and Ed25519, reports are `134-390` bytes each, depending on the
+length of the memo field.  Servers can optionally strip the trailing 64 bytes
+of each report if client verification is not important.
+
 ## Attacks
 
 ### Linkage Attack
