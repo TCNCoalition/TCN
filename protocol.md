@@ -300,19 +300,21 @@ record, and do not have to be trusted to mitigate impersonation.
 Roughly, we replace `S` and `L` by the signing and verification keys of a
 signature scheme.
 
+**XXX** Remove the description above after initial review of the new description.
+
 The app creates `rak` (the *report authorization key*) and `rvk` (the *report
 verification key*) as the signing and verification keys of a signature scheme.
-Then it computes the initial *CEN key* as
+Then it computes the initial *contact event key (CEK)* as
 ```
-k_0 ← H_k(rak).
+cek_0 ← H_cek(rak).
 ```
-CEN keys are updated by computing
+Contact event keys support a *ratchet* operation:
 ```
-k_i ← H_k(rvk || k_{i-1}).
+cek_i ← H_cek(rvk || cek_{i-1}).
 ```
-CENs are derived from the CEN key by computing
+A *contact event number (CEN)* is derived from the contact event key by computing
 ```
-CEN_i ← H_CEN(le_u16(i) || k_i).
+cen_i ← H_cen(le_u16(i) || cek_i).
 ```
 Note that each report authorization key can create at most `2**16` CENs.  In
 practice, reports should be rotated more frequently.
@@ -320,7 +322,7 @@ practice, reports should be rotated more frequently.
 A user wishing to notify contacts they encountered over the period `j1` to `j2`
 prepares a report as
 ```
-report ← rvk || k_{j1} || le_u16(j1) || le_u16(j2) || memo
+report ← rvk || cek_{j1} || le_u16(j1) || le_u16(j2) || memo
 ```
 where `memo` is a variable-length bytestring with the following structure:
 ```
@@ -332,9 +334,9 @@ Then they use `rsk` to produce `sig`, a signature over `report`, and send
 Anyone can verify the source integity of the report by checking `sig` over
 `report` using the included `rvk`, and recompute the CENs as
 ```
-CEN_j1 ← H_CEN(le_u16(j1) || k_{j1})
-k_{j1+1} ← H_k(rvk || k_{j1})
-CEN_{j1+1} ← H_CEN(le_u16(j1+1) || k_{j1+1})
+cen_j1 ← H_cen(le_u16(j1) || cek_{j1})
+cek_{j1+1} ← H_cek(rvk || cek_{j1})
+cen_{j1+1} ← H_cen(le_u16(j1+1) || cek_{j1+1})
 ...
 ```
 Using SHA256 and Ed25519, reports are `134-390` bytes each, depending on the
