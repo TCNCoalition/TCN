@@ -280,6 +280,7 @@ repositories.
 - George Danezis (UCL),
 - Ian Miers,
 - Henry de Valence <hdevalence@hdevalence.ca>,
+- Daniel Reusche,
 
 [CoEpi]: https://www.coepi.org/
 [CovidWatch]: https://www.covid-watch.org/
