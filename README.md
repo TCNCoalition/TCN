@@ -1,6 +1,7 @@
 # CEN Protocol
 
-> This is a work-in-progress document.
+> This is a work-in-progress document. Changes are tracked through PRs
+> and issues.
 
 This document describes **Contact Event Numbers**, a decentralized,
 privacy-preserving contact tracing protocol developed by [CoEpi] and
