@@ -15,6 +15,10 @@ applications using the CEN protocol can interoperate, and the protocol can be
 used with either verified test results or for self-reported symptoms via an
 extensible report memo field.
 
+This repository also contains a reference implementation of the CEN protocol
+written in Rust. View documentation by running `cargo doc --no-deps --open`,
+and run tests by running `cargo test`.
+
 **XXX** Fill in the rest of this introduction with an overview of the document's contents.
 
 ## Ideal functionality and trust assumptions in contact tracing systems
