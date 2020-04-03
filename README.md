@@ -15,6 +15,10 @@ applications using the CEN protocol can interoperate, and the protocol can be
 used with either verified test results or for self-reported symptoms via an
 extensible report memo field.
 
+This repository also contains a reference implementation of the CEN protocol
+written in Rust. View documentation by running `cargo doc --no-deps --open`,
+and run tests by running `cargo test`.
+
 **XXX** Fill in the rest of this introduction with an overview of the document's contents.
 
 ## Ideal functionality and trust assumptions in contact tracing systems
@@ -212,9 +216,10 @@ memo field could contain a bitflag describing self-reported symptoms, in the
 case of [CoEpi], or a signature verifying test results, in the case of
 [CovidWatch].
 
-The memo field is between 2 and 258 bytes and has the following structure:
+The memo field is between 2 and 258 bytes and has the following
+tag-length-value structure:
 ```
-len: u8 || type: u8 || data: [u8; len]
+type: u8 || len: u8 || data: [u8; len]
 ```
 The `type` field has the following meaning:
 - `0x0`: CoEpi symptom report v1;
