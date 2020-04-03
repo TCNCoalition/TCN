@@ -1,4 +1,4 @@
-Contact Tracing Bill of Rights
+# Contact Tracing Bill of Rights
 
 1. Users must be able to install and use a contact tracing app without having to divulge any personal information to anyone.
 2. Contact tracing apps must not disclose any information during normal operation that can be used by third parties to track a user’s interactions or locations.
