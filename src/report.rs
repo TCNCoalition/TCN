@@ -111,8 +111,8 @@ impl ReportAuthorizationKey {
 /// A signed exposure report, whose source integrity can be verified to produce a `Report`.
 #[derive(Clone, Debug)]
 pub struct SignedReport {
-    report: Report,
-    sig: ed25519_zebra::Signature,
+    pub(crate) report: Report,
+    pub(crate) sig: ed25519_zebra::Signature,
 }
 
 impl SignedReport {

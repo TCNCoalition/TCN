@@ -5,7 +5,7 @@ use std::{
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
-use super::{Error, MemoType, Report};
+use super::{ContactEventKey, Error, MemoType, Report, ReportAuthorizationKey, SignedReport};
 
 /// Some convenience methods to add to Read.
 trait ReadExt: io::Read + Sized {
@@ -17,12 +17,20 @@ trait ReadExt: io::Read + Sized {
         Ok(bytes)
     }
 
+    /// Convenience method to read a `[u8; 64]`.
+    #[inline]
+    fn read_64_bytes(&mut self) -> io::Result<[u8; 64]> {
+        let mut bytes = [0; 64];
+        self.read_exact(&mut bytes)?;
+        Ok(bytes)
+    }
+
     /// Convenience method to read a short vector with a 1-byte length tag.
     #[inline]
     fn read_compact_vec(&mut self) -> io::Result<Vec<u8>> {
         let len = self.read_u8()? as usize;
         let mut bytes = Vec::with_capacity(len);
-        self.take(len as u64).read_exact(&mut bytes)?;
+        self.take(len as u64).read_to_end(&mut bytes)?;
         Ok(bytes)
     }
 }
@@ -63,7 +71,7 @@ impl Report {
     ///
     /// This method fails only when the memo data is too long or in the event of
     /// an underlying I/O error.
-    pub fn write<W: std::io::Write>(&self, mut writer: W) -> Result<(), Error> {
+    pub fn write<W: io::Write>(&self, mut writer: W) -> Result<(), Error> {
         let memo_len = u8::try_from(self.memo_data.len())
             .map_err(|_| Error::OversizeMemo(self.memo_data.len()))?;
         writer.write_all(&<[u8; 32]>::from(self.rvk))?;
@@ -73,6 +81,56 @@ impl Report {
         writer.write_u8(self.memo_type as u8)?;
         writer.write_u8(memo_len)?;
         writer.write_all(&self.memo_data)?;
+        Ok(())
+    }
+}
+
+impl SignedReport {
+    /// Try to read a `SignedReport` from a generic `io::Read`er.
+    pub fn read<R: io::Read>(mut reader: R) -> Result<SignedReport, Error> {
+        Ok(SignedReport {
+            report: Report::read(&mut reader)?,
+            sig: reader.read_64_bytes()?.into(),
+        })
+    }
+
+    /// Try to write a `SignedReport` into a generic `io::Write`er.
+    pub fn write<W: io::Write>(&self, mut writer: W) -> Result<(), Error> {
+        self.report.write(&mut writer)?;
+        writer.write_all(&<[u8; 64]>::from(self.sig)[..])?;
+        Ok(())
+    }
+}
+
+impl ReportAuthorizationKey {
+    /// Try to read a `ReportAuthorizationKey` from a generic `io::Read`er.
+    pub fn read<R: io::Read>(mut reader: R) -> Result<ReportAuthorizationKey, io::Error> {
+        Ok(ReportAuthorizationKey {
+            rak: reader.read_32_bytes()?.into(),
+        })
+    }
+
+    /// Try to write a `ReportAuthorizationKey` into a generic `io::Write`er.
+    pub fn write<W: io::Write>(&self, mut writer: W) -> Result<(), io::Error> {
+        writer.write_all(&<[u8; 32]>::from(self.rak))
+    }
+}
+
+impl ContactEventKey {
+    /// Try to read a `ContactEventKey` from a generic `io::Read`er.
+    pub fn read<R: io::Read>(mut reader: R) -> Result<ContactEventKey, io::Error> {
+        Ok(ContactEventKey {
+            index: reader.read_u16::<LittleEndian>()?,
+            rvk: reader.read_32_bytes()?.into(),
+            cek_bytes: reader.read_32_bytes()?,
+        })
+    }
+
+    /// Try to write a `ContactEventKey` into a generic `io::Write`er.
+    pub fn write<W: io::Write>(&self, mut writer: W) -> Result<(), io::Error> {
+        writer.write_u16::<LittleEndian>(self.index)?;
+        writer.write_all(&<[u8; 32]>::from(self.rvk))?;
+        writer.write_all(&self.cek_bytes)?;
         Ok(())
     }
 }
