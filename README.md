@@ -5,25 +5,31 @@
 
 **What's on this page:**
 
-- [CEN Protocol](#cen-protocol)
+  * [Introduction](#introduction)
   * [Ideal functionality and trust assumptions in contact tracing systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
   * [A strawman protocol](#a-strawman-protocol)
   * [The CEN Protocol](#the-cen-protocol)
   * [CEN sharing with Bluetooth Low Energy](#cen-sharing-with-bluetooth-low-energy)
   * [Contributors](#contributors)
 - [Notes to be merged with main document](#notes-to-be-merged-with-main-document)
-  * [Key rotation and compression factor:](#key-rotation-and-compression-factor)
-  * [Rotation considerations:](#rotation-considerations)
-  * [Further considerations.](#further-considerations)
+  * [Key rotation and compression factor](#key-rotation-and-compression-factor)
+  * [Rotation considerations](#rotation-considerations)
+  * [Further considerations](#further-considerations)
   * [Attacks](#attacks)
     + [Linkage Attack](#linkage-attack)
     + [Replay Attack](#replay-attack)
   * [Counting CEN collisions](#counting-cen-collisions)
+***
 
+## Introduction
 
 This document describes **Contact Event Numbers**, a decentralized,
 privacy-first contact tracing protocol developed by [CoEpi] and
-[CovidWatch]. No personally-identifiable information is required by the
+[CovidWatch]. However, this protcol is not limited in use to CoEpi or CovidWatch, and is built with the goal of being used more broadly. 
+
+The CEN protocol and related efforts are design with this [Contact Tracing Bill of Rights](/ContactTracingBillOfRights.md) in mind.
+
+No personally-identifiable information is required by the
 protocol, and although it is compatible with a trusted health authority, it
 does not require one. Users' devices send short-range broadcasts over
 Bluetooth to nearby devices. Later, a user who develops symptoms or tests
