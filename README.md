@@ -3,6 +3,24 @@
 > This is a work-in-progress document. Changes are tracked through PRs
 > and issues.
 
+**What's on this page:**
+
+- [CEN Protocol](#cen-protocol)
+  * [Ideal functionality and trust assumptions in contact tracing systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
+  * [A strawman protocol](#a-strawman-protocol)
+  * [The CEN Protocol](#the-cen-protocol)
+  * [CEN sharing with Bluetooth Low Energy](#cen-sharing-with-bluetooth-low-energy)
+  * [Contributors](#contributors)
+- [Notes to be merged with main document](#notes-to-be-merged-with-main-document)
+  * [Key rotation and compression factor:](#key-rotation-and-compression-factor)
+  * [Rotation considerations:](#rotation-considerations)
+  * [Further considerations.](#further-considerations)
+  * [Attacks](#attacks)
+    + [Linkage Attack](#linkage-attack)
+    + [Replay Attack](#replay-attack)
+  * [Counting CEN collisions](#counting-cen-collisions)
+
+
 This document describes **Contact Event Numbers**, a decentralized,
 privacy-first contact tracing protocol developed by [CoEpi] and
 [CovidWatch]. No personally-identifiable information is required by the
@@ -293,7 +311,7 @@ repositories.
 
 # Notes (to be merged with main document)
 
-## Key rotation and compression factor:
+## Key rotation and compression factor
 
 One important question is how frequently do we change the key. If it does not
 change, then uploading the key on a positive test reveals all contacts a user
@@ -302,7 +320,7 @@ the key every time we generate a CEN, then we are back to the strawman random
 CEN and the resulting scalability problems. What is an appropriate middle
 ground?
 
-## Rotation considerations:
+## Rotation considerations
 
 The key rotation interval must balance a trade off between security and
 scalability. Consider, for example, rotating keys every day. This should result
@@ -350,7 +368,7 @@ all CENs which have a report containing the same symptoms are from the same
 user. This is the same information that would be leaked by using a long
 rekeying interval.
 
-## Further considerations.
+## Further considerations
 
 In the setting where CENs are continuously broadcast, we must also choose the
 rate at which we change from one CEN to another.  Again, the longer a CEN lasts
