@@ -212,9 +212,10 @@ memo field could contain a bitflag describing self-reported symptoms, in the
 case of [CoEpi], or a signature verifying test results, in the case of
 [CovidWatch].
 
-The memo field is between 2 and 258 bytes and has the following structure:
+The memo field is between 2 and 258 bytes and has the following
+tag-length-value structure:
 ```
-len: u8 || type: u8 || data: [u8; len]
+type: u8 || len: u8 || data: [u8; len]
 ```
 The `type` field has the following meaning:
 - `0x0`: CoEpi symptom report v1;

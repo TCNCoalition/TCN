@@ -1,100 +1,67 @@
-use rand_core::{CryptoRng, RngCore};
-use sha2::{Digest, Sha256};
+//! Reference implementation of **Contact Event Numbers**, a decentralized,
+//! privacy-first contact tracing protocol developed by [CoEpi] and [CovidWatch].
+//! No personally-identifiable information is required by the
+//! protocol, and although it is compatible with a trusted health authority, it
+//! does not require one. Users' devices send short-range broadcasts over
+//! Bluetooth to nearby devices. Later, a user who develops symptoms or tests
+//! positive can report their status to their contacts with minimal loss of
+//! privacy. Users who do not send reports reveal no information. Different
+//! applications using the CEN protocol can interoperate, and the protocol can be
+//! used with either verified test results or for self-reported symptoms via an
+//! extensible report memo field.
+//!
+//! For more information on the protocol, see the [README].
+//!
+//! [CoEpi]: https://www.coepi.org/
+//! [CovidWatch]: https://www.covid-watch.org/
+//! [README]: https://github.com/Co-Epi/CEN/blob/main/README.md
+//!
+//! # Example
+//!
+//! ```
+//! use cen::*;
+//! // Generate a report authorization key.  This key represents the capability
+//! // to publish a report about a collection of derived contact event numbers.
+//! let rak = ReportAuthorizationKey::new(rand::thread_rng());
+//!
+//! // Use the contact event key ratchet mechanism to compute a list of contact
+//! // event numbers.
+//! let mut cek = rak.initial_cek();
+//! let mut cens = Vec::new();
+//! for _ in 0..100 {
+//!     cens.push(cek.contact_event_number());
+//!     cek = cek.ratchet().unwrap();
+//! }
+//!
+//! // Prepare a report about a subset of the contact event numbers.
+//! let signed_report = rak
+//!     .create_report(
+//!         MemoType::CoEpiV1,        // The memo type
+//!         b"symptom data".to_vec(), // The memo data
+//!         20,                       // Index of the first CEN to disclose
+//!         100,                      // Index of the last CEN to check
+//!     )
+//!     .expect("Report creation can only fail if the memo data is too long");
+//!
+//! // Verify the source integrity of the report...
+//! let report = signed_report
+//!     .verify()
+//!     .expect("Valid reports should verify correctly");
+//!
+//! // ...allowing the disclosed CENs to be recomputed.
+//! let recomputed_cens = report.contact_event_numbers().collect::<Vec<_>>();
+//!
+//! // Check that the recomputed CENs match the originals.
+//! assert_eq!(&recomputed_cens[..], &cens[20..100]);
+//! ```
 
-const H_CEK_DOMAIN_SEP: &[u8; 5] = b"H_CEK";
-const H_CEN_DOMAIN_SEP: &[u8; 5] = b"H_CEN";
+#![deny(missing_docs)]
 
-pub struct ReportAuthorizationKey {
-    // We don't store rvk explicitly because it's cached inside the SecretKey.
-    rak: ed25519_zebra::SecretKey,
-}
+mod error;
+mod keys;
+mod report;
+mod serialize;
 
-impl ReportAuthorizationKey {
-    pub fn new<R: RngCore + CryptoRng>(rng: R) -> ReportAuthorizationKey {
-        ReportAuthorizationKey {
-            rak: ed25519_zebra::SecretKey::new(rng),
-        }
-    }
-
-    pub fn initial_cek(&self) -> ContactEventKey {
-        let rvk = ed25519_zebra::PublicKeyBytes::from(&self.rak);
-
-        let cek_0 = {
-            // There's a bit of an awkward dance to get digests into fixed-size
-            // arrays because Rust doesn't have const generics (yet).
-            let mut bytes = [0; 32];
-            bytes.copy_from_slice(
-                &Sha256::default()
-                    .chain(H_CEK_DOMAIN_SEP)
-                    .chain(&self.rak)
-                    .result()[..],
-            );
-            bytes
-        };
-
-        ContactEventKey {
-            index: 0,
-            rvk,
-            cek: cek_0,
-        }
-    }
-}
-
-pub struct ContactEventKey {
-    index: u16,
-    rvk: ed25519_zebra::PublicKeyBytes,
-    cek: [u8; 32],
-}
-
-impl ContactEventKey {
-    pub fn index(&self) -> u16 {
-        self.index
-    }
-
-    pub fn ratchet(self) -> Option<ContactEventKey> {
-        let ContactEventKey { index, rvk, cek } = self;
-        if let Some(next_index) = index.checked_add(1) {
-            let next_cek = {
-                let mut bytes = [0; 32];
-                bytes.copy_from_slice(
-                    &Sha256::default()
-                        .chain(H_CEK_DOMAIN_SEP)
-                        .chain(&cek)
-                        .result()[..],
-                );
-                bytes
-            };
-            Some(ContactEventKey {
-                rvk,
-                index: next_index,
-                cek: next_cek,
-            })
-        } else {
-            None
-        }
-    }
-}
-
-pub struct ContactEventNumber(pub [u8; 16]);
-
-impl<'a> From<&'a ContactEventKey> for ContactEventNumber {
-    fn from(key: &'a ContactEventKey) -> ContactEventNumber {
-        let mut bytes = [0; 16];
-        bytes.copy_from_slice(
-            &Sha256::default()
-                .chain(H_CEN_DOMAIN_SEP)
-                .chain(&key.index.to_le_bytes()[..])
-                .chain(&key.cek)
-                .result()[..],
-        );
-        ContactEventNumber(bytes)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+pub use error::Error;
+pub use keys::{ContactEventKey, ContactEventNumber, ReportAuthorizationKey};
+pub use report::{MemoType, Report, SignedReport};
