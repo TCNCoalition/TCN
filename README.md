@@ -43,6 +43,8 @@ This repository also contains a reference implementation of the CEN protocol
 written in Rust. View documentation by running `cargo doc --no-deps --open`,
 and run tests by running `cargo test`.
 
+PRs and Issues are welcome to be submitted directly to this repo. For questions about the CEN Protocol or collaborating in more detail, contact [Henry](mailto:hdevalence@hdevalence.ca?Subject=CEN%20Protocol) or [Dana](mailto:dana+CoEpi@OpenAPS.org?Subject=CEN%20Protocol). 
+
 **XXX** Fill in the rest of this introduction with an overview of the document's contents.
 
 ## Ideal functionality and trust assumptions in contact tracing systems
