@@ -22,7 +22,7 @@ impl ReportAuthorizationKey {
     }
 
     /// Compute the initial contact event key derived from this report authorization key.
-    pub fn initial_cek(&self) -> ContactEventKey {
+    pub fn initial_contact_event_key(&self) -> ContactEventKey {
         let rvk = ed25519_zebra::PublicKeyBytes::from(&self.rak);
 
         let cek_bytes = {

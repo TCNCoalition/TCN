@@ -83,7 +83,7 @@ impl ReportAuthorizationKey {
         // Recompute cek_{j_1}. This requires recomputing j_1 hashes, but
         // creating reports is done infrequently and it means we don't force the
         // caller to have saved all intermediate hashes.
-        let mut cek = self.initial_cek();
+        let mut cek = self.initial_contact_event_key();
         for _ in 0..j_1 {
             cek = cek.ratchet().expect(
                 "cek ratchet must be Some because we don't ratchet more than u16::MAX times",

@@ -8,7 +8,7 @@ fn generate_contact_event_numbers_and_report_them() {
 
     // Use the contact event key ratchet mechanism to compute a list of contact
     // event numbers.
-    let mut cek = rak.initial_cek();
+    let mut cek = rak.initial_contact_event_key();
     let mut cens = Vec::new();
     for _ in 0..100 {
         cens.push(cek.contact_event_number());
