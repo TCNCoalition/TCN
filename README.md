@@ -11,6 +11,7 @@
   * [The CEN Protocol](#the-cen-protocol)
   * [CEN sharing with Bluetooth Low Energy](#cen-sharing-with-bluetooth-low-energy)
   * [Contributors](#contributors)
+As it is a work-in-progress, this page also contains rough notes: 
 - [Notes to be merged with main document](#notes-to-be-merged-with-main-document)
   * [Key rotation and compression factor](#key-rotation-and-compression-factor)
   * [Rotation considerations](#rotation-considerations)
@@ -424,4 +425,3 @@ after a reveal, this attack can only be executed in a short timeframe.
 With 128 Bit CENs, at a world population of 8bn, expected total collision count for 
 all legitimately generated CENs from a two week timeframe (revealed and non-revealed), 
 without sharding, is ~1.7e-13 (see [`collisions.jl`](./scripts/collisions.jl)).
-
