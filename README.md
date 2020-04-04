@@ -180,7 +180,7 @@ signature) can be relayed to other users for public verifiability, or checked
 only by the server.
 
 **Report Key Generation**. The user-agent creates the *report authorization
-*key* `rak` and the *report verification key* `rvk` as the signing and
+key* `rak` and the *report verification key* `rvk` as the signing and
 verification keys of a signature scheme.
 Then it computes the initial *contact event key (CEK)* as
 ```
