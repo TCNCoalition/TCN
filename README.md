@@ -5,13 +5,15 @@
 
 **What's on this page:**
 
-  * [Introduction](#introduction)
-  * [Ideal functionality and trust assumptions in contact tracing systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
-  * [A strawman protocol](#a-strawman-protocol)
-  * [The CEN Protocol](#the-cen-protocol)
-  * [CEN sharing with Bluetooth Low Energy](#cen-sharing-with-bluetooth-low-energy)
-  * [Contributors](#contributors)
+- [Introduction](#introduction)
+- [Ideal functionality and trust assumptions in contact tracing systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
+- [A strawman protocol](#a-strawman-protocol)
+- [The CEN Protocol](#the-cen-protocol)
+- [CEN sharing with Bluetooth Low Energy](#cen-sharing-with-bluetooth-low-energy)
+- [Contributors](#contributors)
+
 As it is a work-in-progress, this page also contains rough notes: 
+
 - [Notes to be merged with main document](#notes-to-be-merged-with-main-document)
   * [Key rotation and compression factor](#key-rotation-and-compression-factor)
   * [Rotation considerations](#rotation-considerations)
@@ -20,15 +22,16 @@ As it is a work-in-progress, this page also contains rough notes:
     + [Linkage Attack](#linkage-attack)
     + [Replay Attack](#replay-attack)
   * [Counting CEN collisions](#counting-cen-collisions)
-***
 
 ## Introduction
 
 This document describes **Contact Event Numbers**, a decentralized,
-privacy-first contact tracing protocol developed by [CoEpi] and
-[CovidWatch]. However, this protocol is not limited to use solely by CoEpi or CovidWatch, and is built to be extensible, with the goal of being used more broadly. 
+privacy-first contact tracing protocol developed by [CoEpi] and [CovidWatch].
+However, this protocol is not limited to use solely by CoEpi or CovidWatch, and
+is built to be extensible, with the goal of being used more broadly.
 
-The CEN protocol and related efforts are design with this [Contact Tracing Bill of Rights](/ContactTracingBillOfRights.md) in mind.
+The CEN protocol and related efforts are designed with the [Contact Tracing
+Bill of Rights](/ContactTracingBillOfRights.md) in mind.
 
 No personally-identifiable information is required by the
 protocol, and although it is compatible with a trusted health authority, it
@@ -44,7 +47,10 @@ This repository also contains a reference implementation of the CEN protocol
 written in Rust. View documentation by running `cargo doc --no-deps --open`,
 and run tests by running `cargo test`.
 
-PRs and Issues are welcome to be submitted directly to this repo. For questions about the CEN Protocol or collaborating in more detail, contact [Henry](mailto:hdevalence@hdevalence.ca?Subject=CEN%20Protocol) or [Dana](mailto:dana+CoEpi@OpenAPS.org?Subject=CEN%20Protocol). 
+PRs and Issues are welcome to be submitted directly to this repo. For questions
+about the CEN Protocol or collaborating in more detail, contact
+[Henry](mailto:hdevalence@hdevalence.ca?Subject=CEN%20Protocol) or
+[Dana](mailto:dana+CoEpi@OpenAPS.org?Subject=CEN%20Protocol).
 
 **XXX** Fill in the rest of this introduction with an overview of the document's contents.
 
