@@ -3,33 +3,10 @@
 > This is a work-in-progress document. Changes are tracked through PRs
 > and issues.
 
-**What's on this page:**
-
-- [Introduction](#introduction)
-- [Ideal functionality and trust assumptions in contact tracing systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
-- [A strawman protocol](#a-strawman-protocol)
-- [The CEN Protocol](#the-cen-protocol)
-- [CEN sharing with Bluetooth Low Energy](#cen-sharing-with-bluetooth-low-energy)
-- [Contributors](#contributors)
-
-As it is a work-in-progress, this page also contains rough notes: 
-
-- [Notes to be merged with main document](#notes-to-be-merged-with-main-document)
-  * [Key rotation and compression factor](#key-rotation-and-compression-factor)
-  * [Rotation considerations](#rotation-considerations)
-  * [Further considerations](#further-considerations)
-  * [Attacks](#attacks)
-    + [Linkage Attack](#linkage-attack)
-    + [Replay Attack](#replay-attack)
-  * [Counting CEN collisions](#counting-cen-collisions)
-
-## Introduction
-
 This document describes **Contact Event Numbers**, a decentralized,
 privacy-first contact tracing protocol developed by [CoEpi] and [CovidWatch].
 However, this protocol is not limited to use solely by CoEpi or CovidWatch, and
 is built to be extensible, with the goal of being used more broadly.
-
 The CEN protocol and related efforts are designed with the [Contact Tracing
 Bill of Rights](/ContactTracingBillOfRights.md) in mind.
 
@@ -52,7 +29,17 @@ about the CEN Protocol or collaborating in more detail, contact
 [Henry](mailto:hdevalence@hdevalence.ca?Subject=CEN%20Protocol) or
 [Dana](mailto:dana+CoEpi@OpenAPS.org?Subject=CEN%20Protocol).
 
-**XXX** Fill in the rest of this introduction with an overview of the document's contents.
+**What's on this page:**
+
+- [Introduction](#cen-protocol)
+- [Ideal functionality and trust assumptions in contact tracing systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
+- [A strawman protocol](#a-strawman-protocol)
+- [The CEN Protocol](#the-cen-protocol)
+- [CEN sharing with Bluetooth Low Energy](#cen-sharing-with-bluetooth-low-energy)
+- [Contributors](#contributors)
+
+As it is a work-in-progress, this page also contains [rough notes, yet to be
+merged with the main document](#notes-to-be-merged-with-main-document)
 
 ## Ideal functionality and trust assumptions in contact tracing systems
 
