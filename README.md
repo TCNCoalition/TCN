@@ -210,7 +210,7 @@ prepares a report as
 report ← rvk || cek_{j1} || le_u16(j1) || le_u16(j2) || memo
 ```
 where `memo` is a variable-length bytestring 2-258 bytes long whose structure
-is described below. Then they use `rsk` to produce `sig`, a signature over
+is described below. Then they use `rak` to produce `sig`, a signature over
 `report`, and send `report || sig` to the server.
 
 **Report Check**.
