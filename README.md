@@ -3,9 +3,34 @@
 > This is a work-in-progress document. Changes are tracked through PRs
 > and issues.
 
+**What's on this page:**
+
+  * [Introduction](#introduction)
+  * [Ideal functionality and trust assumptions in contact tracing systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
+  * [A strawman protocol](#a-strawman-protocol)
+  * [The CEN Protocol](#the-cen-protocol)
+  * [CEN sharing with Bluetooth Low Energy](#cen-sharing-with-bluetooth-low-energy)
+  * [Contributors](#contributors)
+As it is a work-in-progress, this page also contains rough notes: 
+- [Notes to be merged with main document](#notes-to-be-merged-with-main-document)
+  * [Key rotation and compression factor](#key-rotation-and-compression-factor)
+  * [Rotation considerations](#rotation-considerations)
+  * [Further considerations](#further-considerations)
+  * [Attacks](#attacks)
+    + [Linkage Attack](#linkage-attack)
+    + [Replay Attack](#replay-attack)
+  * [Counting CEN collisions](#counting-cen-collisions)
+***
+
+## Introduction
+
 This document describes **Contact Event Numbers**, a decentralized,
 privacy-first contact tracing protocol developed by [CoEpi] and
-[CovidWatch]. No personally-identifiable information is required by the
+[CovidWatch]. However, this protocol is not limited to use solely by CoEpi or CovidWatch, and is built to be extensible, with the goal of being used more broadly. 
+
+The CEN protocol and related efforts are design with this [Contact Tracing Bill of Rights](/ContactTracingBillOfRights.md) in mind.
+
+No personally-identifiable information is required by the
 protocol, and although it is compatible with a trusted health authority, it
 does not require one. Users' devices send short-range broadcasts over
 Bluetooth to nearby devices. Later, a user who develops symptoms or tests
@@ -18,6 +43,8 @@ extensible report memo field.
 This repository also contains a reference implementation of the CEN protocol
 written in Rust. View documentation by running `cargo doc --no-deps --open`,
 and run tests by running `cargo test`.
+
+PRs and Issues are welcome to be submitted directly to this repo. For questions about the CEN Protocol or collaborating in more detail, contact [Henry](mailto:hdevalence@hdevalence.ca?Subject=CEN%20Protocol) or [Dana](mailto:dana+CoEpi@OpenAPS.org?Subject=CEN%20Protocol). 
 
 **XXX** Fill in the rest of this introduction with an overview of the document's contents.
 
@@ -293,7 +320,7 @@ repositories.
 
 # Notes (to be merged with main document)
 
-## Key rotation and compression factor:
+## Key rotation and compression factor
 
 One important question is how frequently do we change the key. If it does not
 change, then uploading the key on a positive test reveals all contacts a user
@@ -302,7 +329,7 @@ the key every time we generate a CEN, then we are back to the strawman random
 CEN and the resulting scalability problems. What is an appropriate middle
 ground?
 
-## Rotation considerations:
+## Rotation considerations
 
 The key rotation interval must balance a trade off between security and
 scalability. Consider, for example, rotating keys every day. This should result
@@ -350,7 +377,7 @@ all CENs which have a report containing the same symptoms are from the same
 user. This is the same information that would be leaked by using a long
 rekeying interval.
 
-## Further considerations.
+## Further considerations
 
 In the setting where CENs are continuously broadcast, we must also choose the
 rate at which we change from one CEN to another.  Again, the longer a CEN lasts
@@ -398,4 +425,3 @@ after a reveal, this attack can only be executed in a short timeframe.
 With 128 Bit CENs, at a world population of 8bn, expected total collision count for 
 all legitimately generated CENs from a two week timeframe (revealed and non-revealed), 
 without sharding, is ~1.7e-13 (see [`collisions.jl`](./scripts/collisions.jl)).
-
