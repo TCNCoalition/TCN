@@ -66,9 +66,6 @@ own, such as fear of stigma or discrimination based on health status, or the
 risk that contact tracing systems could be repurposed for surveillance by
 governments or individuals.  This makes location privacy paramount.
 
-**XXX** Add note explaining why the other categories are under-appreciated, and
-why the protocol does not require a centralized authority.
-
 However, trust in functional capacity is also problematic. In an ideal world,
 health authorities would have unlimited resources and perfect effectiveness
 in deploying them. But in the real world, health authorities have limited
