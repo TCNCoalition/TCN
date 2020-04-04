@@ -26,7 +26,7 @@ As it is a work-in-progress, this page also contains rough notes:
 
 This document describes **Contact Event Numbers**, a decentralized,
 privacy-first contact tracing protocol developed by [CoEpi] and
-[CovidWatch]. However, this protcol is not limited in use to CoEpi or CovidWatch, and is built with the goal of being used more broadly. 
+[CovidWatch]. However, this protocol is not limited to use solely by CoEpi or CovidWatch, and is built to be extensible, with the goal of being used more broadly. 
 
 The CEN protocol and related efforts are design with this [Contact Tracing Bill of Rights](/ContactTracingBillOfRights.md) in mind.
 
