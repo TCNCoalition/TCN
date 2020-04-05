@@ -193,8 +193,9 @@ hash function with 256 bits of output.
 ```
 cek_i ← H_cek(rvk || cek_{i-1}).
 ```
-As noted below, it is crucial that CEK ratchet is synchronized with MAC
-rotation at the Bluetooth layer to prevent linkability attacks.
+Where `||` denotes concatenation. As noted below, it is crucial that CEK
+ratchet is  synchronized with MAC rotation at the Bluetooth layer to prevent
+linkability attacks.
 
 **CEN Generation**. A contact event number is derived from a contact event 
 key by computing
