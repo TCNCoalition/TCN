@@ -84,7 +84,9 @@ does not, so reducing trust requirements may allow accelerated deployment.
 For these reasons, it seems preferable to design a protocol that does not
 require participation by any health authority, but is optionally compatible
 with health authorities that verify report integrity (e.g., by sending
-reports to a portal that signs them on behalf of the health authority).
+reports to a portal that signs them on behalf of the health authority or
+allowing the authorities to generate URLs that pass an authenticated
+positive diagnosis result to an app).
 Leaving the question of report integrity as an application-level concern
 means that different applications can make different choices, while still
 remaining interoperable. For instance, [CoEpi] allows users to self-report
