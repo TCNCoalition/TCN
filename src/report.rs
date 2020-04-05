@@ -68,7 +68,7 @@ impl ReportAuthorizationKey {
     /// Creating a report reveals *all* contact event numbers subsequent to
     /// `j_1`, not just up to `j_2`, which is included for convenience.
     ///
-    /// The `memo_data` must be less than 256 bytes.
+    /// The `memo_data` must be less than 256 bytes long.
     ///
     /// Reports are unlinkable from each other **only up to the memo field**. In
     /// other words, adding the same high-entropy data to the memo fields of
