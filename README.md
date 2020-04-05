@@ -20,14 +20,14 @@ applications using the CEN protocol can interoperate, and the protocol can be
 used with either verified test results or for self-reported symptoms via an
 extensible report memo field.
 
-This repository also contains a reference implementation of the CEN protocol
-written in Rust. View documentation by running `cargo doc --no-deps --open`,
-and run tests by running `cargo test`.
-
 PRs and Issues are welcome to be submitted directly to this repo. For questions
 about the CEN Protocol or collaborating in more detail, contact
 [Henry](mailto:hdevalence@hdevalence.ca?Subject=CEN%20Protocol) or
 [Dana](mailto:dana+CoEpi@OpenAPS.org?Subject=CEN%20Protocol).
+
+This repository also contains a reference implementation of the CEN protocol
+written in Rust. View documentation by running `cargo doc --no-deps --open`,
+and run tests by running `cargo test`.
 
 **What's on this page:**
 
