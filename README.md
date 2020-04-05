@@ -209,7 +209,7 @@ prepares a report as
 ```
 report ← rvk || cek_{j1} || le_u16(j1) || le_u16(j2) || memo
 ```
-where `memo` is a variable-length bytestring 2-258 bytes long whose structure
+where `memo` is a variable-length bytestring 2-257 bytes long whose structure
 is described below. Then they use `rak` to produce `sig`, a signature over
 `report`, and send `report || sig` to the server.
 
@@ -233,12 +233,13 @@ memo field could contain a bitflag describing self-reported symptoms, in the
 case of [CoEpi], or a signature verifying test results, in the case of
 [CovidWatch].
 
-The memo field is between 2 and 258 bytes and has the following
+The memo field is between 2 and 257 bytes and has the following
 tag-length-value structure:
 ```
 type: u8 || len: u8 || data: [u8; len]
 ```
-The `type` field has the following meaning:
+The `data` field contains 0-255 bytes of data whose type is
+encoded by the `type` field, which has the following meaning:
 - `0x0`: CoEpi symptom report v1;
 - `0x1`: CovidWatch test result v1;
 - `0x2-0xfe`: reserved for allocations to applications on request;
@@ -249,8 +250,8 @@ The `type` field has the following meaning:
 * `H_cen` using SHA256 with domain separator `b"H_CEN"`;
 * `rak` and `rvk` as the signing and verification keys of Ed25519.
 
-These parameter choices result in signed reports of 134-390 bytes or unsigned
-reports of 70-326 bytes, depending on the length of the memo field.
+These parameter choices result in signed reports of 134-389 bytes or unsigned
+reports of 70-325 bytes, depending on the length of the memo field.
 
 ## CEN sharing with Bluetooth Low Energy
 
