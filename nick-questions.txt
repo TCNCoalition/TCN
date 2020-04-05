@@ -1,0 +1,25 @@
+
+1. Why is the memo field in report so small?  Sourabh mentioned that this was so the whole report could be transmitted via bluetooth.  But in order for contact tracing to be effective, the client needs to download potentially thousands of these reports, i.e. at least one per infected user in the area, to see if they've been exposed.  How can they download these via Bluetooth?  If we think this is an impractical method to download thousands, and instead rely on http, then there's no reason to keep memo small.  Memo can be a rich source of data and I think it should be large enough to answer as-yet-unknown questions that epidemiologists may want to ask.
+
+2. Why does there need to be TWO levels of rotating keys, i.e. both rvk and CEK?  Isn't one level enough?  Consider the following scheme:
+
+cen_0 <- H_cen(rak)
+cen_i <- H_cen(rvk || cen_{i-1})
+
+then a report over the period j1 to j2 is
+
+report <- rvk || cen_{j1} || j1 || j2 || memo
+
+So anyone can re-compute the CENs and compare to their observations just by cen_{j1+1} <- H_cen(rvk || cen_j1)
+
+Doesn't this have all the benefits of the current scheme, without the added complexity of rotating CEK?  You can still rotate rvk as often as you'd like.
+
+3. The following paragraph from the readme:
+
+"Key rotation and compression factor
+One important question is how frequently do we change the key. If it does not change, then uploading the key on a positive test reveals all contacts a user has ever had, even several months ago. On the other extreme, we could change the key every time we generate a CEN, then we are back to the strawman random CEN and the resulting scalability problems. What is an appropriate middle ground?"
+
+Is this key rotation referring to the rvk or the CEK?  If rvk, then I don't think the second sentence is correct as long as CEK changes often.  If key rotation is referring to CEK, then the third sentence is incorrect as you can change CEK as often as you like and still only have to upload one report, i.e. it doesn't create scalability problems.
+
+Thanks!
+Nick
