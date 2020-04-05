@@ -74,7 +74,9 @@ fail to respond adequately or effectively. Indeed, each of these
 possibilities has already happened during the current epidemic. While no
 technological system can properly compensate for institutional failure, a
 system that is resilient to failure can potentially absorb slack and give
-people agency to help themselves.
+people agency to help themselves. For further reading on the relationship
+between public health agencies and anonymous contact tracing protocols, see
+[this shared research document](https://docs.google.com/document/d/16Kh4_Q_tmyRh0-v452wiul9oQAiTRj8AdZ5vcOJum9Y/edit#).
 
 Moreover, a protocol that places additional burdens on health authorities
 (e.g., requiring them to deploy complex cryptography like MPC or carefully
