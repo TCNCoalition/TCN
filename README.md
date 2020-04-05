@@ -84,7 +84,9 @@ does not, so reducing trust requirements may allow accelerated deployment.
 For these reasons, it seems preferable to design a protocol that does not
 require participation by any health authority, but is optionally compatible
 with health authorities that verify report integrity (e.g., by sending
-reports to a portal that signs them on behalf of the health authority).
+reports to a portal that signs them on behalf of the health authority or
+allowing the authorities to generate URLs that pass an authenticated
+positive diagnosis result to an app).
 Leaving the question of report integrity as an application-level concern
 means that different applications can make different choices, while still
 remaining interoperable. For instance, [CoEpi] allows users to self-report
@@ -193,10 +195,9 @@ hash function with 256 bits of output.
 ```
 cek_i ← H_cek(rvk || cek_{i-1}).
 ```
-Note: The "||" operator is used in cryptography to denote string concatenation.
-
-As noted below, it is crucial that CEK ratchet is synchronized with MAC
-rotation at the Bluetooth layer to prevent linkability attacks.
+where `||` denotes concatenation. As noted below, it is crucial that CEK
+ratchet is  synchronized with MAC rotation at the Bluetooth layer to prevent
+linkability attacks.
 
 **CEN Generation**. A contact event number is derived from a contact event 
 key by computing
@@ -293,6 +294,10 @@ It is expected that the process to generate the 128-bit CEN will not vary
 between different platforms, but the process of communicating CENs between
 platforms has been reduced to working implementations in the above
 repositories.
+
+## References and Further Reading
+
+- [Shared research document tracking privacy-preserving contact tracing mechanisms](https://docs.google.com/document/d/16Kh4_Q_tmyRh0-v452wiul9oQAiTRj8AdZ5vcOJum9Y/edit#).
 
 ## Contributors
 
