@@ -197,7 +197,7 @@ hash function with 256 bits of output.
 ```
 cek_i ← H_cek(rvk || cek_{i-1}).
 ```
-Where `||` denotes concatenation. As noted below, it is crucial that CEK
+where `||` denotes concatenation. As noted below, it is crucial that CEK
 ratchet is  synchronized with MAC rotation at the Bluetooth layer to prevent
 linkability attacks.
 
