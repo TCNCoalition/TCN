@@ -3,32 +3,12 @@
 > This is a work-in-progress document. Changes are tracked through PRs
 > and issues.
 
-**What's on this page:**
-
-  * [Introduction](#introduction)
-  * [Ideal functionality and trust assumptions in contact tracing systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
-  * [A strawman protocol](#a-strawman-protocol)
-  * [The CEN Protocol](#the-cen-protocol)
-  * [CEN sharing with Bluetooth Low Energy](#cen-sharing-with-bluetooth-low-energy)
-  * [Contributors](#contributors)
-As it is a work-in-progress, this page also contains rough notes: 
-- [Notes to be merged with main document](#notes-to-be-merged-with-main-document)
-  * [Key rotation and compression factor](#key-rotation-and-compression-factor)
-  * [Rotation considerations](#rotation-considerations)
-  * [Further considerations](#further-considerations)
-  * [Attacks](#attacks)
-    + [Linkage Attack](#linkage-attack)
-    + [Replay Attack](#replay-attack)
-  * [Counting CEN collisions](#counting-cen-collisions)
-***
-
-## Introduction
-
 This document describes **Contact Event Numbers**, a decentralized,
-privacy-first contact tracing protocol developed by [CoEpi] and
-[CovidWatch]. However, this protocol is not limited to use solely by CoEpi or CovidWatch, and is built to be extensible, with the goal of being used more broadly. 
-
-The CEN protocol and related efforts are design with this [Contact Tracing Bill of Rights](/ContactTracingBillOfRights.md) in mind.
+privacy-first contact tracing protocol developed by [CoEpi] and [CovidWatch].
+However, this protocol is not limited to use solely by CoEpi or CovidWatch, and
+is built to be extensible, with the goal of being used more broadly.
+The CEN protocol and related efforts are designed with the [Contact Tracing
+Bill of Rights](/ContactTracingBillOfRights.md) in mind.
 
 No personally-identifiable information is required by the
 protocol, and although it is compatible with a trusted health authority, it
@@ -44,9 +24,22 @@ This repository also contains a reference implementation of the CEN protocol
 written in Rust. View documentation by running `cargo doc --no-deps --open`,
 and run tests by running `cargo test`.
 
-PRs and Issues are welcome to be submitted directly to this repo. For questions about the CEN Protocol or collaborating in more detail, contact [Henry](mailto:hdevalence@hdevalence.ca?Subject=CEN%20Protocol) or [Dana](mailto:dana+CoEpi@OpenAPS.org?Subject=CEN%20Protocol). 
+PRs and Issues are welcome to be submitted directly to this repo. For questions
+about the CEN Protocol or collaborating in more detail, contact
+[Henry](mailto:hdevalence@hdevalence.ca?Subject=CEN%20Protocol) or
+[Dana](mailto:dana+CoEpi@OpenAPS.org?Subject=CEN%20Protocol).
 
-**XXX** Fill in the rest of this introduction with an overview of the document's contents.
+**What's on this page:**
+
+- [Introduction](#cen-protocol)
+- [Ideal functionality and trust assumptions in contact tracing systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
+- [A strawman protocol](#a-strawman-protocol)
+- [The CEN Protocol](#the-cen-protocol)
+- [CEN sharing with Bluetooth Low Energy](#cen-sharing-with-bluetooth-low-energy)
+- [Contributors](#contributors)
+
+As it is a work-in-progress, this page also contains [rough notes, yet to be
+merged with the main document](#notes-to-be-merged-with-main-document)
 
 ## Ideal functionality and trust assumptions in contact tracing systems
 
@@ -72,9 +65,6 @@ treatment as may be appropriate.  However, contact tracing poses risks of its
 own, such as fear of stigma or discrimination based on health status, or the
 risk that contact tracing systems could be repurposed for surveillance by
 governments or individuals.  This makes location privacy paramount.
-
-**XXX** Add note explaining why the other categories are under-appreciated, and
-why the protocol does not require a centralized authority.
 
 However, trust in functional capacity is also problematic. In an ideal world,
 health authorities would have unlimited resources and perfect effectiveness
@@ -190,7 +180,7 @@ signature) can be relayed to other users for public verifiability, or checked
 only by the server.
 
 **Report Key Generation**. The user-agent creates the *report authorization
-*key* `rak` and the *report verification key* `rvk` as the signing and
+key* `rak` and the *report verification key* `rvk` as the signing and
 verification keys of a signature scheme.
 Then it computes the initial *contact event key (CEK)* as
 ```
@@ -220,7 +210,7 @@ prepares a report as
 report ← rvk || cek_{j1} || le_u16(j1) || le_u16(j2) || memo
 ```
 where `memo` is a variable-length bytestring 2-258 bytes long whose structure
-is described below. Then they use `rsk` to produce `sig`, a signature over
+is described below. Then they use `rak` to produce `sig`, a signature over
 `report`, and send `report || sig` to the server.
 
 **Report Check**.
