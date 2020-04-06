@@ -258,31 +258,44 @@ reports of 70-325 bytes, depending on the length of the memo field.
 
 ## CEN sharing with Bluetooth Low Energy
 
-Applications following this protocol are based on iOS and Android applications
-capability to broadcast a 128-bit Contact Event Number (CEN) using Bluetooth
-Low Energy.  Current prototype implementations are using the following service
-UUID and characteristic UUID:
-```
-service UUID = "C019"
-characteristic UUID = "D61F4F27-3D6B-4B04-9E46-C9D2EA617F62"
-```
-Each device (Central) scans its environment and finds another device
-(Peripheral) with the same service UUID, finding CEN in either the
-Characteristic or ServiceData field.  Energy considerations may guide protocol
-design so that scan frequencies are kept reasonable.  There are 4 key flows:
+Applications following this protocol use iOS and Android apps' capability to share a 128-bit Temporary Contact Number (TCN) with nearby apps using Bluetooth Low Energy (BLE).
 
-|  |  | How the Contact Event Number (CEN) Is Found |
-|-------------|----------------|---------------------------------------------|
-| iOS Central (C) | iOS Peripheral (P) | Central (C) connects to Peripheral (P) and reads the value of the characteristic. |
-| Android (1) | Android (2) | 1 reads 2’s CEN from the ServiceData field of the Service Advertisement broadcast. Frequency of changing the CEN is 15 minutes.  |
-| iOS (1) | Android (2) | This combination is equivalent to the Android-Android one from above.  |
-| Android (1) | iOS (2) | To avoid using GATT client code on Anroid, for an Android device to receive a CEN from an iOS device, the iOS device connects as central and writes the value of the characteristic.  |
+Sharing TCNs using BLE should work:
+- cross-platform between iOS and Android apps.
+- cross-app.
+- without asking the user to access their location.
+- power-efficiently, with the least amount of BLE traffic.
+- between apps while they both are in the background with the devices' screen locked.
 
-To work around the background discoverability issue on iOS, where two iOS devices can't discover each other if both are sleeping, Android devices act as a "bridge" and broadcast the CENs they receive via the characteristic write operation (4th combination from above).
+With the above requirements, we encountered the following BLE platform limitations:
+- iOS 13.4 (and older) does not support the discoverability between third-party iOS apps in the suspended or background-running state, and with the devices' screens locked. Note: If the user unlocks the screen or launches an app (e.g., Settings.app), which does active Bluetooth scanning, then yes.
+- iOS 13.4 (and older) does not support the broadcasting of small advertisement data of third-party apps, while Android supports up to 31 bytes.
 
-Current open source implementations (MIT License) from CoEpi + CovidWatch
-generating CENs locally and covering the communication for each of the above 4
-key flows are being developed in the following repositories:
+To overcome the above limitations, the protocol uses both broadcast-oriented and connection-oriented BLE modes to share TCNs. The terminology used for BLE devices in these modes are:
+- Broadcaster and observer in broadcast-oriented mode.
+- Peripheral and central in connection-oriented mode.
+
+In both modes, the protocol uses the `0xC019` 16-bit UUID for the service identifier.
+
+In broadcast-oriented mode, a broadcaster advertises a 16-byte TCN using the service data field (`0x16` GAP) of the advertisement data. The observer reads the TCN from this field.
+
+In connection-oriented mode, the peripheral adds a primary service whose UUID is `0xC019` to the GATT database and advertises it. The service exposes a readable and writeable characteristic whose UUID is `D61F4F27-3D6B-4B04-9E46-C9D2EA617F62` for sharing TCNs. After sharing a TCN, the centrals disconnect from the peripherals.
+
+### How the Temporary Contact Number (TCN) is Found
+
+Android-Android, iOS-Android: 1 observes 2’s broadcast and reads the value from the advertisement data.
+
+Android-iOS: 2 connects to 1 and writes the value of the characteristic and disconnects.
+
+iOS(F)-iOS(B), iOS(B)-iOS(F): 1 connects to 2 and reads the value of the characteristic and disconnects.
+
+iOS(B)-iOS(B): Nearby Android device acts as a bridge: It adds the TCNs received through the characteristic write requests and will advertise those also, while in range.
+
+F = App in Foreground
+
+B = App in Background
+
+Current open-source implementations from CoEpi + Covid Watch generating TCNs locally and covering the communication for each of the above key flows are being developed in the following repositories:
 
 * https://github.com/Co-Epi/app-android
 * https://github.com/Co-Epi/app-ios
@@ -290,8 +303,8 @@ key flows are being developed in the following repositories:
 * https://github.com/covid19risk/covidwatch-android
 * [if you have a repository, please file a PR to add it here]
 
-It is expected that the process to generate the 128-bit CEN will not vary
-between different platforms, but the process of communicating CENs between
+It is expected that the process to generate the 128-bit TCN will not vary
+between different platforms, but the process of communicating TCNs between
 platforms has been reduced to working implementations in the above
 repositories.
 
@@ -307,7 +320,7 @@ repositories.
 - Jack Gallagher,
 - Hamish,
 - Manu Eder <manulari@posteo.eu>,
-- Zsombor Szabo,
+- Zsombor Szabo, <zsombor@gmail.com>
 - George Danezis (UCL),
 - Ian Miers,
 - Henry de Valence <hdevalence@hdevalence.ca>,
