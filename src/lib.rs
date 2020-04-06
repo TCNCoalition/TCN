@@ -63,5 +63,5 @@ mod report;
 mod serialize;
 
 pub use error::Error;
-pub use keys::{TemporaryContactKey, TemporaryContactNumber, ReportAuthorizationKey};
+pub use keys::{ReportAuthorizationKey, TemporaryContactKey, TemporaryContactNumber};
 pub use report::{MemoType, Report, SignedReport};

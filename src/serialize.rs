@@ -5,7 +5,7 @@ use std::{
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
-use super::{TemporaryContactKey, Error, MemoType, Report, ReportAuthorizationKey, SignedReport};
+use super::{Error, MemoType, Report, ReportAuthorizationKey, SignedReport, TemporaryContactKey};
 
 /// Some convenience methods to add to Read.
 trait ReadExt: io::Read + Sized {

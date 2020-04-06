@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-pub use super::{TemporaryContactKey, TemporaryContactNumber, Error, ReportAuthorizationKey};
+pub use super::{Error, ReportAuthorizationKey, TemporaryContactKey, TemporaryContactNumber};
 
 /// Describes the intended type of the contents of a memo field.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
