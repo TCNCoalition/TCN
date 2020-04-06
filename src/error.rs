@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-/// Errors related to the CEN protocol.
+/// Errors related to the TCN protocol.
 #[derive(Error, Debug)]
 pub enum Error {
     /// An unknown memo type was encountered while parsing a report.

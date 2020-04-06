@@ -5,7 +5,7 @@ use std::{
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
-use super::{ContactEventKey, Error, MemoType, Report, ReportAuthorizationKey, SignedReport};
+use super::{TemporaryContactKey, Error, MemoType, Report, ReportAuthorizationKey, SignedReport};
 
 /// Some convenience methods to add to Read.
 trait ReadExt: io::Read + Sized {
@@ -59,7 +59,7 @@ impl Report {
     pub fn read<R: std::io::Read>(mut reader: R) -> Result<Report, Error> {
         Ok(Report {
             rvk: reader.read_32_bytes()?.into(),
-            cek_bytes: reader.read_32_bytes()?,
+            tck_bytes: reader.read_32_bytes()?,
             j_1: reader.read_u16::<LittleEndian>()?,
             j_2: reader.read_u16::<LittleEndian>()?,
             memo_type: reader.read_u8()?.try_into()?,
@@ -75,7 +75,7 @@ impl Report {
         let memo_len = u8::try_from(self.memo_data.len())
             .map_err(|_| Error::OversizeMemo(self.memo_data.len()))?;
         writer.write_all(&<[u8; 32]>::from(self.rvk))?;
-        writer.write_all(&self.cek_bytes)?;
+        writer.write_all(&self.tck_bytes)?;
         writer.write_u16::<LittleEndian>(self.j_1)?;
         writer.write_u16::<LittleEndian>(self.j_2)?;
         writer.write_u8(self.memo_type as u8)?;
@@ -116,21 +116,21 @@ impl ReportAuthorizationKey {
     }
 }
 
-impl ContactEventKey {
-    /// Try to read a `ContactEventKey` from a generic `io::Read`er.
-    pub fn read<R: io::Read>(mut reader: R) -> Result<ContactEventKey, io::Error> {
-        Ok(ContactEventKey {
+impl TemporaryContactKey {
+    /// Try to read a `TemporaryContactKey` from a generic `io::Read`er.
+    pub fn read<R: io::Read>(mut reader: R) -> Result<TemporaryContactKey, io::Error> {
+        Ok(TemporaryContactKey {
             index: reader.read_u16::<LittleEndian>()?,
             rvk: reader.read_32_bytes()?.into(),
-            cek_bytes: reader.read_32_bytes()?,
+            tck_bytes: reader.read_32_bytes()?,
         })
     }
 
-    /// Try to write a `ContactEventKey` into a generic `io::Write`er.
+    /// Try to write a `TemporaryContactKey` into a generic `io::Write`er.
     pub fn write<W: io::Write>(&self, mut writer: W) -> Result<(), io::Error> {
         writer.write_u16::<LittleEndian>(self.index)?;
         writer.write_all(&<[u8; 32]>::from(self.rvk))?;
-        writer.write_all(&self.cek_bytes)?;
+        writer.write_all(&self.tck_bytes)?;
         Ok(())
     }
 }
