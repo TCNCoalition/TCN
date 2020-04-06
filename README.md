@@ -181,6 +181,8 @@ secret when submitting a report. This proof (in the form of a digital
 signature) can be relayed to other users for public verifiability, or checked
 only by the server.
 
+### Key Derivation.
+
 **Report Key Generation**. The user-agent creates the *report authorization
 key* `rak` and the *report verification key* `rvk` as the signing and
 verification keys of a signature scheme.
@@ -206,7 +208,27 @@ cen_i ← H_cen(le_u16(i) || cek_i),
 ```
 where `H_cen` is a domain-separated hash function with 128 bits of output.
 
-**Report Generation**. 
+**Diagram**.  The key derivation process is illustrated in the following
+diagram:
+```
+             ┌───┐
+  ┌─────────▶│rvk│────────┬──────────┬──────────┬──────┬──────────┐
+  │          └───┘        │          │          │      │          │
+  │                       │          │          │      │          │
+┌───┐             ┌─────┐ │  ┌─────┐ │  ┌─────┐ │      │  ┌─────┐ │
+│rak│────────────▶│cek_0│─┴─▶│cek_1│─┴─▶│cek_2│─┴─▶...─┴─▶│cek_n│─┴─▶...
+└───┘             └─────┘    └─────┘    └─────┘           └─────┘
+                     │          │          │                 │
+                     ▼          ▼          ▼                 ▼
+                  ┌─────┐    ┌─────┐    ┌─────┐           ┌─────┐
+                  │cen_0│    │cen_1│    │cen_2│           │cen_n│
+                  └─────┘    └─────┘    └─────┘           └─────┘
+```
+Notice that knowledge of `rvk` and `cek_i` is sufficent to recover
+all subsequent `cek_j`, and hence all subsequent `cen_j`.
+
+### Reporting.
+
 A user wishing to notify contacts they encountered over the period `j1` to `j2`
 prepares a report as
 ```
