@@ -53,7 +53,7 @@ fn basic_read_write_round_trip() {
         .expect("writing should succeed");
     assert_eq!(buf1, buf2);
 
-    let mut cek = rak.initial_contact_event_key();
+    let cek = rak.initial_contact_event_key();
 
     let mut buf1 = Vec::new();
     let mut buf2 = Vec::new();
