@@ -38,11 +38,14 @@ impl ReportAuthorizationKey {
             bytes
         };
 
+        // Immediately ratchet cek_0 to return cek_1.
         ContactEventKey {
             index: 0,
             rvk,
             cek_bytes,
         }
+        .ratchet()
+        .expect("0 < u16::MAX")
     }
 }
 
@@ -97,6 +100,7 @@ impl ContactEventKey {
                 bytes.copy_from_slice(
                     &Sha256::default()
                         .chain(H_CEK_DOMAIN_SEP)
+                        .chain(&rvk)
                         .chain(&cek_bytes)
                         .result()[..],
                 );

@@ -19,6 +19,7 @@ pub enum MemoType {
 pub struct Report {
     pub(crate) rvk: ed25519_zebra::PublicKeyBytes,
     pub(crate) cek_bytes: [u8; 32],
+    // Invariant: j_1 > 0.
     pub(crate) j_1: u16,
     pub(crate) j_2: u16,
     pub(crate) memo_type: MemoType,
@@ -39,10 +40,13 @@ impl Report {
     /// Return an iterator over all contact event numbers included in the report.
     pub fn contact_event_numbers(&self) -> impl Iterator<Item = ContactEventNumber> {
         let mut cek = ContactEventKey {
-            index: self.j_1,
+            // Does not underflow as j_1 > 0.
+            index: self.j_1 - 1,
             rvk: self.rvk,
             cek_bytes: self.cek_bytes,
         };
+        // Ratchet to obtain cek_{j_1}.
+        cek = cek.ratchet().expect("j_1 - 1 < j_1 <= u16::MAX");
 
         (self.j_1..self.j_2).map(move |_| {
             let cen = cek.contact_event_number();
@@ -80,19 +84,22 @@ impl ReportAuthorizationKey {
         j_1: u16,
         j_2: u16,
     ) -> Result<SignedReport, Error> {
-        // Recompute cek_{j_1}. This requires recomputing j_1 hashes, but
+        // Ensure that j_1 is at least 1.
+        let j_1 = if j_1 == 0 { 1 } else { j_1 };
+
+        // Recompute cek_{j_1-1}. This requires recomputing j_1-1 hashes, but
         // creating reports is done infrequently and it means we don't force the
         // caller to have saved all intermediate hashes.
         let mut cek = self.initial_contact_event_key();
-        for _ in 0..j_1 {
-            cek = cek.ratchet().expect(
-                "cek ratchet must be Some because we don't ratchet more than u16::MAX times",
-            );
+        // initial_contact_event_key returns cek_1, so begin iteration at 1.
+        for _ in 1..(j_1 - 1) {
+            cek = cek.ratchet().expect("j_1 - 1 < u16::MAX");
         }
 
         let report = Report {
             rvk: ed25519_zebra::PublicKeyBytes::from(&self.rak),
             cek_bytes: cek.cek_bytes,
+            // Invariant: we have ensured j_1 > 0 above.
             j_1,
             j_2,
             memo_type,

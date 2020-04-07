@@ -20,13 +20,14 @@
 //!
 //! ```
 //! use cen::*;
+//! # // Copied from tests/basic_functionality.rs; update it there.
 //! // Generate a report authorization key.  This key represents the capability
 //! // to publish a report about a collection of derived contact event numbers.
 //! let rak = ReportAuthorizationKey::new(rand::thread_rng());
 //!
 //! // Use the contact event key ratchet mechanism to compute a list of contact
 //! // event numbers.
-//! let mut cek = rak.initial_contact_event_key();
+//! let mut cek = rak.initial_contact_event_key(); // cek <- cek_1
 //! let mut cens = Vec::new();
 //! for _ in 0..100 {
 //!     cens.push(cek.contact_event_number());
@@ -39,7 +40,7 @@
 //!         MemoType::CoEpiV1,        // The memo type
 //!         b"symptom data".to_vec(), // The memo data
 //!         20,                       // Index of the first CEN to disclose
-//!         100,                      // Index of the last CEN to check
+//!         90,                       // Index of the last CEN to check
 //!     )
 //!     .expect("Report creation can only fail if the memo data is too long");
 //!
@@ -52,7 +53,8 @@
 //! let recomputed_cens = report.contact_event_numbers().collect::<Vec<_>>();
 //!
 //! // Check that the recomputed CENs match the originals.
-//! assert_eq!(&recomputed_cens[..], &cens[20..100]);
+//! // The slice is offset by 1 because cen_0 is not included.
+//! assert_eq!(&recomputed_cens[..], &cens[20 - 1..90 - 1]);
 //! ```
 
 #![deny(missing_docs)]
