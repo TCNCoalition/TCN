@@ -1,27 +1,27 @@
-use cen::*;
+use tcn::*;
 
 #[test]
-fn generate_contact_event_numbers_and_report_them() {
+fn generate_temporary_contact_numbers_and_report_them() {
     // Generate a report authorization key.  This key represents the capability
-    // to publish a report about a collection of derived contact event numbers.
+    // to publish a report about a collection of derived temporary contact numbers.
     let rak = ReportAuthorizationKey::new(rand::thread_rng());
 
-    // Use the contact event key ratchet mechanism to compute a list of contact
-    // event numbers.
-    let mut cek = rak.initial_contact_event_key(); // cek <- cek_1
-    let mut cens = Vec::new();
+    // Use the temporary contact key ratchet mechanism to compute a list
+    // of temporary contact numbers.
+    let mut tck = rak.initial_temporary_contact_key(); // tck <- tck_1
+    let mut tcns = Vec::new();
     for _ in 0..100 {
-        cens.push(cek.contact_event_number());
-        cek = cek.ratchet().unwrap();
+        tcns.push(tck.temporary_contact_number());
+        tck = tck.ratchet().unwrap();
     }
 
-    // Prepare a report about a subset of the contact event numbers.
+    // Prepare a report about a subset of the temporary contact numbers.
     let signed_report = rak
         .create_report(
             MemoType::CoEpiV1,        // The memo type
             b"symptom data".to_vec(), // The memo data
-            20,                       // Index of the first CEN to disclose
-            90,                       // Index of the last CEN to check
+            20,                       // Index of the first TCN to disclose
+            90,                       // Index of the last TCN to check
         )
         .expect("Report creation can only fail if the memo data is too long");
 
@@ -30,12 +30,12 @@ fn generate_contact_event_numbers_and_report_them() {
         .verify()
         .expect("Valid reports should verify correctly");
 
-    // ...allowing the disclosed CENs to be recomputed.
-    let recomputed_cens = report.contact_event_numbers().collect::<Vec<_>>();
+    // ...allowing the disclosed TCNs to be recomputed.
+    let recomputed_tcns = report.temporary_contact_numbers().collect::<Vec<_>>();
 
-    // Check that the recomputed CENs match the originals.
-    // The slice is offset by 1 because cen_0 is not included.
-    assert_eq!(&recomputed_cens[..], &cens[20 - 1..90 - 1]);
+    // Check that the recomputed TCNs match the originals.
+    // The slice is offset by 1 because tcn_0 is not included.
+    assert_eq!(&recomputed_tcns[..], &tcns[20 - 1..90 - 1]);
 }
 
 #[test]
@@ -54,13 +54,13 @@ fn basic_read_write_round_trip() {
         .expect("writing should succeed");
     assert_eq!(buf1, buf2);
 
-    let cek = rak.initial_contact_event_key();
+    let tck = rak.initial_temporary_contact_key();
 
     let mut buf1 = Vec::new();
     let mut buf2 = Vec::new();
-    cek.write(Cursor::new(&mut buf1))
+    tck.write(Cursor::new(&mut buf1))
         .expect("writing should succeed");
-    ContactEventKey::read(Cursor::new(&buf1))
+    TemporaryContactKey::read(Cursor::new(&buf1))
         .expect("reading should succeed")
         .write(Cursor::new(&mut buf2))
         .expect("writing should succeed");
@@ -70,8 +70,8 @@ fn basic_read_write_round_trip() {
         .create_report(
             MemoType::CoEpiV1,        // The memo type
             b"symptom data".to_vec(), // The memo data
-            20,                       // Index of the first CEN to disclose
-            100,                      // Index of the last CEN to check
+            20,                       // Index of the first TCN to disclose
+            100,                      // Index of the last TCN to check
         )
         .expect("Report creation can only fail if the memo data is too long");
 
