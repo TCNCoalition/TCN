@@ -186,16 +186,17 @@ only by the server.
 **Report Key Generation**. The user-agent creates the *report authorization
 key* `rak` and the *report verification key* `rvk` as the signing and
 verification keys of a signature scheme.
-Then it computes the initial *contact event key (CEK)* as
+Then it computes the initial *contact event key (CEK)* `cek_1` as
 ```
-cek_0 ← H_cek(rak).
+cek_0 ← H_cek(rak)
+cek_1 ← H_cek(rvk || cek_0)
 ```
 Each report can contain at most `2**16` CENs. `H_cek` is a domain-separated
 hash function with 256 bits of output.
 
 **CEK Ratchet**. Contact event keys support a *ratchet* operation:
 ```
-cek_i ← H_cek(rvk || cek_{i-1}).
+cek_i ← H_cek(rvk || cek_{i-1}),
 ```
 where `||` denotes concatenation. As noted below, it is crucial that CEK
 ratchet is  synchronized with MAC rotation at the Bluetooth layer to prevent
@@ -211,28 +212,27 @@ where `H_cen` is a domain-separated hash function with 128 bits of output.
 **Diagram**.  The key derivation process is illustrated in the following
 diagram:
 ```
-             ┌───┐
-  ┌─────────▶│rvk│────────┬──────────┬──────────┬──────┬──────────┐
-  │          └───┘        │          │          │      │          │
-  │                       │          │          │      │          │
-┌───┐             ┌─────┐ │  ┌─────┐ │  ┌─────┐ │      │  ┌─────┐ │
-│rak│────────────▶│cek_0│─┴─▶│cek_1│─┴─▶│cek_2│─┴─▶...─┴─▶│cek_n│─┴─▶...
-└───┘             └─────┘    └─────┘    └─────┘           └─────┘
-                     │          │          │                 │
-                     ▼          ▼          ▼                 ▼
-                  ┌─────┐    ┌─────┐    ┌─────┐           ┌─────┐
-                  │cen_0│    │cen_1│    │cen_2│           │cen_n│
-                  └─────┘    └─────┘    └─────┘           └─────┘
+      ┌───┐
+  ┌──▶│rvk│─────────┬──────────┬──────────┬──────────┬──────────┐
+  │   └───┘         │          │          │          │          │
+┌───┐       ┌─────┐ │  ┌─────┐ │  ┌─────┐ │          │  ┌─────┐ │
+│rak│──────▶│cek_0│─┴─▶│cek_1│─┴─▶│cek_2│─┴─▶  ...  ─┴─▶│cek_n│─┴─▶...
+└───┘       └─────┘    └─────┘    └─────┘               └─────┘
+                          │          │                     │
+                          ▼          ▼                     ▼
+                       ┌─────┐    ┌─────┐               ┌─────┐
+                       │cen_1│    │cen_2│               │cen_n│
+                       └─────┘    └─────┘               └─────┘
 ```
 Notice that knowledge of `rvk` and `cek_i` is sufficent to recover
 all subsequent `cek_j`, and hence all subsequent `cen_j`.
 
 ### Reporting.
 
-A user wishing to notify contacts they encountered over the period `j1` to `j2`
-prepares a report as
+A user wishing to notify contacts they encountered over the period `j1 >
+0` to `j2` prepares a report as
 ```
-report ← rvk || cek_{j1} || le_u16(j1) || le_u16(j2) || memo
+report ← rvk || cek_{j1-1} || le_u16(j1) || le_u16(j2) || memo
 ```
 where `memo` is a variable-length bytestring 2-257 bytes long whose structure
 is described below. Then they use `rak` to produce `sig`, a signature over
@@ -242,14 +242,17 @@ is described below. Then they use `rak` to produce `sig`, a signature over
 Anyone can verify the source integity of the report by checking `sig` over
 `report` using the included `rvk`, recompute the CENs as
 ```
-cen_j1 ← H_cen(le_u16(j1) || cek_{j1})
-cek_{j1+1} ← H_cek(rvk || cek_{j1})
-cen_{j1+1} ← H_cen(le_u16(j1+1) || cek_{j1+1})
+cek_j1 ← H_cek(rvk || cek_{j1-1})              # Ratchet
+cen_j1 ← H_cen(le_u16(j1) || cek_{j1})         # Generate
+cek_{j1+1} ← H_cek(rvk || cek_{j1})            # Ratchet
+cen_{j1+1} ← H_cen(le_u16(j1+1) || cek_{j1+1}) # Generate
 ...
 ```
-and compare the recomputed CENs with their observations. The server can
-optionally strip the trailing 64 byte `sig` from each report if client
-verification is not important.
+and compare the recomputed CENs with their observations.  Note that the
+CEN derived from the provided `cek_{j1-1}` is *not* included in the
+report, because the recipient cannot verify that it is bound to `rvk`.
+The server can optionally strip the trailing 64 byte `sig` from each
+report if client verification is not important.
 
 **Memo Structure**.
 The memo field provides a compact space for freeform messages. This ensures

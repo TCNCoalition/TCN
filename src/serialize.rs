@@ -57,14 +57,21 @@ impl Report {
 
     /// Try to read a `Report` from a generic `io::Read`er.
     pub fn read<R: std::io::Read>(mut reader: R) -> Result<Report, Error> {
-        Ok(Report {
+        let report = Report {
             rvk: reader.read_32_bytes()?.into(),
             cek_bytes: reader.read_32_bytes()?,
             j_1: reader.read_u16::<LittleEndian>()?,
             j_2: reader.read_u16::<LittleEndian>()?,
             memo_type: reader.read_u8()?.try_into()?,
             memo_data: reader.read_compact_vec()?,
-        })
+        };
+
+        // Invariant: j_1 > 0
+        if report.j_1 > 0 {
+            Ok(report)
+        } else {
+            Err(Error::InvalidReportIndex)
+        }
     }
 
     /// Try to write a `Report` into a generic `io::Write`er.
