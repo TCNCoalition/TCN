@@ -39,3 +39,7 @@ When new TCN coalition members launch their own apps, or launch new partnerships
 # User experience
 
 A TCN compatible app would be able to see all other compatible apps via Bluetooth, exchange TCNs, and check exposure via its own app API endpoint and/or those of other TCN coalition members. The app would notify the user of potential exposures identically whether the potentially infectious user was using the same app or another TCN compatible app. If the app user reported symptoms or a positive test, they would do so directly using their own app’s mechanisms (if implemented), and other apps would be able to retrieve that report via the mechanisms described above. This preserves each app’s UX, provides maximum flexibility to app developers, and ensures that all pertinent test or symptom reports are displayed to all users who should see them.
+
+# Contributors
+
+In addition to those shown in the GitHub commit history, the following individuals contributed to [drafting](https://docs.google.com/document/d/1B4Un1J04ZtwbY-xENkQFMLd9iDWm7ByjaPYumkTqotg/edit#) this document: Andreas Gebhard, Jenny Wanger, Nele Pauline, Harper Reed, and James Petrie
