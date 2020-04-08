@@ -88,20 +88,41 @@ fn match_btreeset() {
         }
     }
 
+    use std::time::Instant;
+
+    println!("Expanding candidates");
+
+    let expansion_start = Instant::now();
     // Now expand the reports into a second BTreeSet of candidates.
     let mut candidate_tcns = BTreeSet::new();
     for report in reports.into_iter() {
         let report = report.verify().expect("test reports should be valid");
         candidate_tcns.extend(report.temporary_contact_numbers());
     }
+    let expansion_time = expansion_start.elapsed();
 
+    println!(
+        "Comparing {} candidates against {} observations",
+        candidate_tcns.len(),
+        observed_tcns.len()
+    );
+
+    let comparison_start = Instant::now();
     // Compute the intersection of the two BTreeSets.
     let reported_tcns = candidate_tcns
         .intersection(&observed_tcns)
         .cloned()
         .collect::<BTreeSet<_>>();
+    let comparison_time = comparison_start.elapsed();
 
     assert_eq!(reported_tcns, expected_reported_tcns);
+
+    println!(
+        "Took {:?} (expansion) + {:?} (comparison) = {:?} (total)",
+        expansion_time,
+        comparison_time,
+        (expansion_time + comparison_time),
+    );
 }
 
 #[test]
