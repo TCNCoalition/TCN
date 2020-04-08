@@ -286,6 +286,11 @@ encoded by the `type` field, which has the following meaning:
 These parameter choices result in signed reports of 134-389 bytes or unsigned
 reports of 70-325 bytes, depending on the length of the memo field.
 
+**Test vectors** can be generated via
+```
+cargo test generate_test_vectors -- --nocapture
+```
+
 ## TCN sharing with Bluetooth Low Energy
 
 Applications following this protocol use iOS and Android apps' capability to share a 128-bit Temporary Contact Number (TCN) with nearby apps using Bluetooth Low Energy (BLE).
