@@ -59,6 +59,7 @@
 //! assert_eq!(&recomputed_tcns[..], &tcns[20 - 1..90 - 1]);
 //! ```
 
+#![doc(html_root_url = "https://docs.rs/tcn/0.4.0")]
 #![deny(missing_docs)]
 
 mod error;

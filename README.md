@@ -30,6 +30,9 @@ This repository also contains a reference implementation of the TCN protocol
 written in Rust. View documentation by running `cargo doc --no-deps --open`,
 and run tests by running `cargo test`.
 
+To coordinate development, the protocol is versioned using [Semver].
+Changes can be found in [`CHANGELOG.md`](./CHANGELOG.md).
+
 **What's on this page:**
 
 - [Introduction](#tcn-protocol)
@@ -40,7 +43,7 @@ and run tests by running `cargo test`.
 - [Contributors](#contributors)
 
 As it is a work-in-progress, this page also contains [rough notes, yet to be
-merged with the main document](#notes-to-be-merged-with-main-document)
+merged with the main document](#notes-to-be-merged-with-main-document).
 
 ## Ideal functionality and trust assumptions in contact tracing systems
 
@@ -356,6 +359,7 @@ repositories.
 [CoEpi]: https://www.coepi.org/
 [CovidWatch]: https://www.covid-watch.org/
 [tcn-coalition]: https://tcn-coalition.org/
+[Semver]: https://semver.org/
 
 # Notes (to be merged with main document)
 
