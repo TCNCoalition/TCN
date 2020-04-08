@@ -55,7 +55,7 @@ impl ReportAuthorizationKey {
 }
 
 /// A pseudorandom 128-bit value broadcast to nearby devices over Bluetooth.
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct TemporaryContactNumber(pub [u8; 16]);
 
 /// A ratcheting key used to derive temporary contact numbers.
