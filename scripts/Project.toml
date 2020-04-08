@@ -1,0 +1,13 @@
+name = "TCNShardingSim"
+uuid = "62c56d96-74c4-4407-a061-8749b1397277"
+version = "0.1.2"
+
+[compat]
+julia = "1.4.0"
+
+[deps]
+GR = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
+Geodesy = "0ef565a4-170c-5f04-8de2-149903a85f3d"
+IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
+Interact = "c601a237-2ae4-5e1e-952c-7a85b0c7eef1"
+WebIO = "0f1e0344-ec1d-5b48-a673-e5cf874b6c29"
