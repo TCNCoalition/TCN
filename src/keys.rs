@@ -22,7 +22,15 @@ impl ReportAuthorizationKey {
     }
 
     /// Compute the initial temporary contact key derived from this report authorization key.
+    ///
+    /// Note: this function returns `tck_1`, the first temporary contact key that can be
+    /// used to generate tcks.
     pub fn initial_temporary_contact_key(&self) -> TemporaryContactKey {
+        self.tck_0().ratchet().expect("0 < u16::MAX")
+    }
+
+    // This is pub(crate) because tck_0 shouldn't be used to generate a tcn.
+    pub(crate) fn tck_0(&self) -> TemporaryContactKey {
         let rvk = ed25519_zebra::PublicKeyBytes::from(&self.rak);
 
         let tck_bytes = {
@@ -38,19 +46,16 @@ impl ReportAuthorizationKey {
             bytes
         };
 
-        // Immediately ratchet tck_0 to return tck_1.
         TemporaryContactKey {
             index: 0,
             rvk,
             tck_bytes,
         }
-        .ratchet()
-        .expect("0 < u16::MAX")
     }
 }
 
 /// A pseudorandom 128-bit value broadcast to nearby devices over Bluetooth.
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct TemporaryContactNumber(pub [u8; 16]);
 
 /// A ratcheting key used to derive temporary contact numbers.

@@ -90,9 +90,8 @@ impl ReportAuthorizationKey {
         // Recompute tck_{j_1-1}. This requires recomputing j_1-1 hashes, but
         // creating reports is done infrequently and it means we don't force the
         // caller to have saved all intermediate hashes.
-        let mut tck = self.initial_temporary_contact_key();
-        // initial_temporary_contact_key returns tck_1, so begin iteration at 1.
-        for _ in 1..(j_1 - 1) {
+        let mut tck = self.tck_0();
+        for _ in 0..(j_1 - 1) {
             tck = tck.ratchet().expect("j_1 - 1 < u16::MAX");
         }
 
