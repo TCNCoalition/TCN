@@ -76,10 +76,11 @@ technological system can properly compensate for institutional failure, a
 system that is resilient to failure can potentially absorb slack and give
 people agency to help themselves.
 
-Moreover, a protocol that places additional burdens on health authorities
-(e.g., requiring them to deploy complex cryptography like MPC or carefully
-manage cryptographic key material) faces severe adoption barriers to one that
-does not, so reducing trust requirements may allow accelerated deployment.
+Moreover, a protocol that places additional burdens on health
+authorities (e.g., requiring them to deploy complex cryptography like
+MPC or carefully manage cryptographic key material) faces severe
+adoption barriers compared to one that does not, so reducing trust
+requirements may allow accelerated deployment.
 
 For these reasons, it seems preferable to design a protocol that does not
 require participation by any health authority, but is optionally compatible
