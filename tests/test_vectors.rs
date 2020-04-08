@@ -1,11 +1,15 @@
+use rand_chacha::{rand_core::SeedableRng, ChaChaRng};
+use std::io::Cursor;
+
 use tcn::*;
 
 // Run cargo test generate_test_vectors -- --nocapture
 #[test]
 fn generate_test_vectors() {
-    use std::io::Cursor;
+    // This is insecure!! It's only done for reproducibility.
+    let rng = ChaChaRng::from_seed([0x19; 32]);
 
-    let rak = ReportAuthorizationKey::new(rand::thread_rng());
+    let rak = ReportAuthorizationKey::new(rng);
 
     let mut buf = Vec::new();
     rak.write(Cursor::new(&mut buf))
