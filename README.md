@@ -1,14 +1,15 @@
-# CEN Protocol
+# TCN Protocol
 
 > This is a work-in-progress document. Changes are tracked through PRs
 > and issues.
 
-This document describes **Contact Event Numbers**, a decentralized,
-privacy-first contact tracing protocol developed by [CoEpi] and [CovidWatch].
-However, this protocol is not limited to use solely by CoEpi or CovidWatch, and
-is built to be extensible, with the goal of being used more broadly.
-The CEN protocol and related efforts are designed with the [Contact Tracing
-Bill of Rights](/ContactTracingBillOfRights.md) in mind.
+This document describes **Temporary Contact Numbers**, a decentralized,
+privacy-first contact tracing protocol developed by the [TCN
+Coalition][tcn-coalition].  This protocol is built to be extensible,
+with the goal of providing interoperability between contact tracing
+applications.  The TCN protocol and related efforts are designed with
+the [Contact Tracing Bill of Rights](/ContactTracingBillOfRights.md) in
+mind.
 
 No personally-identifiable information is required by the
 protocol, and although it is compatible with a trusted health authority, it
@@ -16,26 +17,26 @@ does not require one. Users' devices send short-range broadcasts over
 Bluetooth to nearby devices. Later, a user who develops symptoms or tests
 positive can report their status to their contacts with minimal loss of
 privacy. Users who do not send reports reveal no information. Different
-applications using the CEN protocol can interoperate, and the protocol can be
+applications using the TCN protocol can interoperate, and the protocol can be
 used with either verified test results or for self-reported symptoms via an
 extensible report memo field.
 
 PRs and Issues are welcome to be submitted directly to this repo. For questions
-about the CEN Protocol or collaborating in more detail, contact
-[Henry](mailto:hdevalence@hdevalence.ca?Subject=CEN%20Protocol) or
-[Dana](mailto:dana+CoEpi@OpenAPS.org?Subject=CEN%20Protocol).
+about the TCN Protocol or collaborating in more detail, contact
+[Henry](mailto:hdevalence@hdevalence.ca?Subject=TCN%20Protocol) or
+[Dana](mailto:dana+CoEpi@OpenAPS.org?Subject=TCN%20Protocol).
 
-This repository also contains a reference implementation of the CEN protocol
+This repository also contains a reference implementation of the TCN protocol
 written in Rust. View documentation by running `cargo doc --no-deps --open`,
 and run tests by running `cargo test`.
 
 **What's on this page:**
 
-- [Introduction](#cen-protocol)
+- [Introduction](#tcn-protocol)
 - [Ideal functionality and trust assumptions in contact tracing systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
 - [A strawman protocol](#a-strawman-protocol)
-- [The CEN Protocol](#the-cen-protocol)
-- [CEN sharing with Bluetooth Low Energy](#cen-sharing-with-bluetooth-low-energy)
+- [The TCN Protocol](#the-tcn-protocol)
+- [TCN sharing with Bluetooth Low Energy](#tcn-sharing-with-bluetooth-low-energy)
 - [Contributors](#contributors)
 
 As it is a work-in-progress, this page also contains [rough notes, yet to be
@@ -76,10 +77,11 @@ technological system can properly compensate for institutional failure, a
 system that is resilient to failure can potentially absorb slack and give
 people agency to help themselves.
 
-Moreover, a protocol that places additional burdens on health authorities
-(e.g., requiring them to deploy complex cryptography like MPC or carefully
-manage cryptographic key material) faces severe adoption barriers to one that
-does not, so reducing trust requirements may allow accelerated deployment.
+Moreover, a protocol that places additional burdens on health
+authorities (e.g., requiring them to deploy complex cryptography like
+MPC or carefully manage cryptographic key material) faces severe
+adoption barriers compared to one that does not, so reducing trust
+requirements may allow accelerated deployment.
 
 For these reasons, it seems preferable to design a protocol that does not
 require participation by any health authority, but is optionally compatible
@@ -97,8 +99,8 @@ This analysis lets us describe the structure and ideal functionality of a
 contact tracing protocol. The protocol's interactions should fit into the
 following phases:
 
-- **Broadcast**: users generate and broadcast Contact Event Numbers (CENs) over
-  Bluetooth to nearby devices.
+- **Broadcast**: users generate and broadcast Temporary Contact Numbers
+  (TCNs) over Bluetooth to nearby devices.
 - **Report**: a user uploads a packet of data to a server to send a report to
   all users they may have encountered in some time interval.
 - **Scan**: users monitor data published by the server to learn whether they
@@ -110,7 +112,7 @@ Ideally, the protocol should have the following properties:
   about any user's location or contacts.
 - **Source Integrity**: Users cannot send reports to users they did not come
   in contact with or on behalf of other users.
-- **Broadcast Integrity**: Users cannot broadcast CENs they did not generate.
+- **Broadcast Integrity**: Users cannot broadcast TCNs they did not generate.
 - **No Passive Tracking**: A passive adversary monitoring Bluetooth connections
   should not be able to learn any information about the location of users who
   do not send reports.
@@ -125,7 +127,7 @@ Ideally, the protocol should have the following properties:
 
 Of these properties, broadcast integrity is very difficult to achieve,
 because it requires authentication at the physical layer to prevent a user
-from rebroadcasting CENs they observed from other users. However, the attack
+from rebroadcasting TCNs they observed from other users. However, the attack
 it prevents is one where an adversary creates ghostly copies of legitimate
 users, and this attack requires the adversary to go around with devices, so
 it does not scale well. In what follows, we do not attempt to achieve
@@ -135,13 +137,13 @@ broadcast integrity.
 
 As a first attempt to formulate a protocol that satisfies these properties,
 we consider a strawman protocol. All mobile devices running the app
-periodically generate a random CEN, store the CEN, and broadcast it using
-Bluetooth. At the same time, the app also listens for and records the CENs
+periodically generate a random TCN, store the TCN, and broadcast it using
+Bluetooth. At the same time, the app also listens for and records the TCNs
 generated by other devices. To send a report, the user (or a health authority
-acting on their behalf) uploads the CENs she generated to a server, together
+acting on their behalf) uploads the TCNs she generated to a server, together
 with a memo field containing application-specific report data. All users'
-apps periodically download the list of reported CENs, then compare it with
-the list of CENs they observed and recorded locally. The intersection of
+apps periodically download the list of reported TCNs, then compare it with
+the list of TCNs they observed and recorded locally. The intersection of
 these two lists is the set of positive contacts.
 
 Intuitively, this provides server privacy, as the server only observes a list
@@ -149,33 +151,33 @@ of random numbers, and cannot correlate them with users or locations without
 colluding with other users.  It prevents passive tracking, because all
 identifiers are randomly generated and therefore unlinkable from each other.
 It provides receiver privacy, because all users download the same list of
-reported CENs and process it locally.  And if the list of CENs is batched
+reported TCNs and process it locally.  And if the list of TCNs is batched
 appropriately, users who send reports do not leak information beyond the time
-of contact to users who observed the CENs.
+of contact to users who observed the TCNs.
 
-However, this proposal does not provide source integrity. Because CENs have
-no structure, nothing prevents a user from observing the CENs broadcast by
+However, this proposal does not provide source integrity. Because TCNs have
+no structure, nothing prevents a user from observing the TCNs broadcast by
 another user and then including them in a report to the server. Notice that
 this is still a problem even in the setting where a health authority verifies
 reports, because although they can attest to test results, they have no way
-to verify the CENs. It also poses scalability issues, because the report
-contains a list of every CEN the user broadcast over the reporting period,
+to verify the TCNs. It also poses scalability issues, because the report
+contains a list of every TCN the user broadcast over the reporting period,
 and all users must download all reports.
 
-## The CEN Protocol
+## The TCN Protocol
 
-To address the scalability issue, we change from purely random CENs to CENs
+To address the scalability issue, we change from purely random TCNs to TCNs
 deterministically generated from some seed data. This reduces the size of the
 report, because it can contain only the compact seed data rather than the
-entire list of CENs. This change trades scalability for reporter privacy,
-because CENs derived from the same report are linkable to each other.
+entire list of TCNs. This change trades scalability for reporter privacy,
+because TCNs derived from the same report are linkable to each other.
 However, this linkage is only possible by parties that have observed multiple
-CENs from the same report, not by all users. Distinct reports are not
+TCNs from the same report, not by all users. Distinct reports are not
 linkable, so users can submit multiple partial reports rather than a single
 report for their entire history. The report rotation frequency adjusts the
 tradeoff between reporter privacy and scalability.
 
-To address the source integrity issue, we additionally bind the derived CENs
+To address the source integrity issue, we additionally bind the derived TCNs
 to a secret held by the user, and require that they prove knowledge of that
 secret when submitting a report. This proof (in the form of a digital
 signature) can be relayed to other users for public verifiability, or checked
@@ -186,28 +188,28 @@ only by the server.
 **Report Key Generation**. The user-agent creates the *report authorization
 key* `rak` and the *report verification key* `rvk` as the signing and
 verification keys of a signature scheme.
-Then it computes the initial *contact event key (CEK)* `cek_1` as
+Then it computes the initial *temporary contact key (TCK)* `tck_1` as
 ```
-cek_0 ← H_cek(rak)
-cek_1 ← H_cek(rvk || cek_0)
+tck_0 ← H_tck(rak)
+tck_1 ← H_cek(rvk || tck_0)
 ```
-Each report can contain at most `2**16` CENs. `H_cek` is a domain-separated
+Each report can contain at most `2**16` TCNs. `H_tck` is a domain-separated
 hash function with 256 bits of output.
 
-**CEK Ratchet**. Contact event keys support a *ratchet* operation:
+**TCK Ratchet**. Contact event keys support a *ratchet* operation:
 ```
-cek_i ← H_cek(rvk || cek_{i-1}),
+tck_i ← H_tck(rvk || tck_{i-1}),
 ```
-where `||` denotes concatenation. As noted below, it is crucial that CEK
-ratchet is  synchronized with MAC rotation at the Bluetooth layer to prevent
+where `||` denotes concatenation. As noted below, it is crucial that the TCK
+ratchet is synchronized with MAC rotation at the Bluetooth layer to prevent
 linkability attacks.
 
-**CEN Generation**. A contact event number is derived from a contact event 
-key by computing
+**TCN Generation**. A temporary contact number is derived from a
+temporary contact key by computing
 ```
-cen_i ← H_cen(le_u16(i) || cek_i),
+tcn_i ← H_tcn(le_u16(i) || tck_i),
 ```
-where `H_cen` is a domain-separated hash function with 128 bits of output.
+where `H_tcn` is a domain-separated hash function with 128 bits of output.
 
 **Diagram**.  The key derivation process is illustrated in the following
 diagram:
@@ -216,23 +218,23 @@ diagram:
   ┌──▶│rvk│─────────┬──────────┬──────────┬──────────┬──────────┐
   │   └───┘         │          │          │          │          │
 ┌───┐       ┌─────┐ │  ┌─────┐ │  ┌─────┐ │          │  ┌─────┐ │
-│rak│──────▶│cek_0│─┴─▶│cek_1│─┴─▶│cek_2│─┴─▶  ...  ─┴─▶│cek_n│─┴─▶...
+│rak│──────▶│tck_0│─┴─▶│tck_1│─┴─▶│tck_2│─┴─▶  ...  ─┴─▶│tck_n│─┴─▶...
 └───┘       └─────┘    └─────┘    └─────┘               └─────┘
                           │          │                     │
                           ▼          ▼                     ▼
                        ┌─────┐    ┌─────┐               ┌─────┐
-                       │cen_1│    │cen_2│               │cen_n│
+                       │tcn_1│    │tcn_2│      ...      │tcn_n│
                        └─────┘    └─────┘               └─────┘
 ```
-Notice that knowledge of `rvk` and `cek_i` is sufficent to recover
-all subsequent `cek_j`, and hence all subsequent `cen_j`.
+Notice that knowledge of `rvk` and `tck_i` is sufficent to recover
+all subsequent `tck_j`, and hence all subsequent `tcn_j`.
 
 ### Reporting.
 
 A user wishing to notify contacts they encountered over the period `j1 >
 0` to `j2` prepares a report as
 ```
-report ← rvk || cek_{j1-1} || le_u16(j1) || le_u16(j2) || memo
+report ← rvk || tck_{j1-1} || le_u16(j1) || le_u16(j2) || memo
 ```
 where `memo` is a variable-length bytestring 2-257 bytes long whose structure
 is described below. Then they use `rak` to produce `sig`, a signature over
@@ -240,16 +242,16 @@ is described below. Then they use `rak` to produce `sig`, a signature over
 
 **Report Check**.
 Anyone can verify the source integity of the report by checking `sig` over
-`report` using the included `rvk`, recompute the CENs as
+`report` using the included `rvk`, recompute the TCNs as
 ```
-cek_j1 ← H_cek(rvk || cek_{j1-1})              # Ratchet
-cen_j1 ← H_cen(le_u16(j1) || cek_{j1})         # Generate
-cek_{j1+1} ← H_cek(rvk || cek_{j1})            # Ratchet
-cen_{j1+1} ← H_cen(le_u16(j1+1) || cek_{j1+1}) # Generate
+tck_j1 ← H_tck(rvk || tck_{j1-1})              # Ratchet
+tcn_j1 ← H_tcn(le_u16(j1) || tck_{j1})         # Generate
+tck_{j1+1} ← H_tck(rvk || tck_{j1})            # Ratchet
+tcn_{j1+1} ← H_tcn(le_u16(j1+1) || tck_{j1+1}) # Generate
 ...
 ```
-and compare the recomputed CENs with their observations.  Note that the
-CEN derived from the provided `cek_{j1-1}` is *not* included in the
+and compare the recomputed TCNs with their observations.  Note that the
+TCN derived from the provided `tck_{j1-1}` is *not* included in the
 report, because the recipient cannot verify that it is bound to `rvk`.
 The server can optionally strip the trailing 64 byte `sig` from each
 report if client verification is not important.
@@ -274,14 +276,14 @@ encoded by the `type` field, which has the following meaning:
 - `0xff`: reserved (can be used to add more than 256 types later).
 
 **Parameter Choices**. We implement 
-* `H_cek` using SHA256 with domain separator `b"H_CEK"`;
-* `H_cen` using SHA256 with domain separator `b"H_CEN"`;
+* `H_tck` using SHA256 with domain separator `b"H_TCK"`;
+* `H_tcn` using SHA256 with domain separator `b"H_TCN"`;
 * `rak` and `rvk` as the signing and verification keys of Ed25519.
 
 These parameter choices result in signed reports of 134-389 bytes or unsigned
 reports of 70-325 bytes, depending on the length of the memo field.
 
-## CEN sharing with Bluetooth Low Energy
+## TCN sharing with Bluetooth Low Energy
 
 Applications following this protocol use iOS and Android apps' capability to share a 128-bit Temporary Contact Number (TCN) with nearby apps using Bluetooth Low Energy (BLE).
 
@@ -353,12 +355,13 @@ repositories.
 
 [CoEpi]: https://www.coepi.org/
 [CovidWatch]: https://www.covid-watch.org/
+[tcn-coalition]: https://tcn-coalition.org/
 
 # Notes (to be merged with main document)
 
 ## Key rotation and compression factor
 
-One important question is how frequently do we change the key. If it does not
+One important question is how frequently do we change the [report] key. If it does not
 change, then uploading the key on a positive test reveals all contacts a user
 has ever had, even several months ago. On the other extreme, we could change
 the key every time we generate a CEN, then we are back to the strawman random

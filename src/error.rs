@@ -1,13 +1,13 @@
 use thiserror::Error;
 
-/// Errors related to the CEN protocol.
+/// Errors related to the TCN protocol.
 #[derive(Error, Debug)]
 pub enum Error {
     /// An unknown memo type was encountered while parsing a report.
     #[error("Unknown memo type {0}")]
     UnknownMemoType(u8),
-    /// Reports cannot include the CEN with index 0.
-    #[error("Invalid CEN index in report")]
+    /// Reports cannot include the TCN with index 0.
+    #[error("Invalid TCN index in report")]
     InvalidReportIndex,
     /// An underlying I/O error occurred while parsing data.
     #[error("I/O error {0}")]

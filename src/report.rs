@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-pub use super::{ContactEventKey, ContactEventNumber, Error, ReportAuthorizationKey};
+pub use super::{Error, ReportAuthorizationKey, TemporaryContactKey, TemporaryContactNumber};
 
 /// Describes the intended type of the contents of a memo field.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -18,7 +18,7 @@ pub enum MemoType {
 #[derive(Clone, Debug)]
 pub struct Report {
     pub(crate) rvk: ed25519_zebra::PublicKeyBytes,
-    pub(crate) cek_bytes: [u8; 32],
+    pub(crate) tck_bytes: [u8; 32],
     // Invariant: j_1 > 0.
     pub(crate) j_1: u16,
     pub(crate) j_2: u16,
@@ -37,23 +37,23 @@ impl Report {
         &self.memo_data
     }
 
-    /// Return an iterator over all contact event numbers included in the report.
-    pub fn contact_event_numbers(&self) -> impl Iterator<Item = ContactEventNumber> {
-        let mut cek = ContactEventKey {
+    /// Return an iterator over all temporary contact numbers included in the report.
+    pub fn temporary_contact_numbers(&self) -> impl Iterator<Item = TemporaryContactNumber> {
+        let mut tck = TemporaryContactKey {
             // Does not underflow as j_1 > 0.
             index: self.j_1 - 1,
             rvk: self.rvk,
-            cek_bytes: self.cek_bytes,
+            tck_bytes: self.tck_bytes,
         };
-        // Ratchet to obtain cek_{j_1}.
-        cek = cek.ratchet().expect("j_1 - 1 < j_1 <= u16::MAX");
+        // Ratchet to obtain tck_{j_1}.
+        tck = tck.ratchet().expect("j_1 - 1 < j_1 <= u16::MAX");
 
         (self.j_1..self.j_2).map(move |_| {
-            let cen = cek.contact_event_number();
-            cek = cek
+            let tcn = tck.temporary_contact_number();
+            tck = tck
                 .ratchet()
                 .expect("we do not ratchet past j_2 <= u16::MAX");
-            cen
+            tcn
         })
     }
 }
@@ -64,12 +64,12 @@ impl ReportAuthorizationKey {
     /// # Inputs
     ///
     /// - `memo_type`, `memo_data`: the type and data for the report's memo field.
-    /// - `j_1`: the ratchet index of the first contact event number in the report.
-    /// - `j_2`: the ratchet index of the last contact event number other users should check.
+    /// - `j_1 > 0`: the ratchet index of the first temporary contact number in the report.
+    /// - `j_2`: the ratchet index of the last temporary contact number other users should check.
     ///
     /// # Notes
     ///
-    /// Creating a report reveals *all* contact event numbers subsequent to
+    /// Creating a report reveals *all* temporary contact numbers subsequent to
     /// `j_1`, not just up to `j_2`, which is included for convenience.
     ///
     /// The `memo_data` must be less than 256 bytes long.
@@ -87,18 +87,18 @@ impl ReportAuthorizationKey {
         // Ensure that j_1 is at least 1.
         let j_1 = if j_1 == 0 { 1 } else { j_1 };
 
-        // Recompute cek_{j_1-1}. This requires recomputing j_1-1 hashes, but
+        // Recompute tck_{j_1-1}. This requires recomputing j_1-1 hashes, but
         // creating reports is done infrequently and it means we don't force the
         // caller to have saved all intermediate hashes.
-        let mut cek = self.initial_contact_event_key();
-        // initial_contact_event_key returns cek_1, so begin iteration at 1.
+        let mut tck = self.initial_temporary_contact_key();
+        // initial_temporary_contact_key returns tck_1, so begin iteration at 1.
         for _ in 1..(j_1 - 1) {
-            cek = cek.ratchet().expect("j_1 - 1 < u16::MAX");
+            tck = tck.ratchet().expect("j_1 - 1 < u16::MAX");
         }
 
         let report = Report {
             rvk: ed25519_zebra::PublicKeyBytes::from(&self.rak),
-            cek_bytes: cek.cek_bytes,
+            tck_bytes: tck.tck_bytes,
             // Invariant: we have ensured j_1 > 0 above.
             j_1,
             j_2,
