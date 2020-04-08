@@ -10,7 +10,13 @@
 # rounding the latitude, longitude, and unix time -- so all users can
 # determine which shards are relevant to them.
 
-# The code below only implements spatial sharding, uncomment example at the bottom to print results.
+# The code below only implements spatially variable sharding,
+# any timeframe can be assumed.
+# Uncomment example at the bottom to print results,
+# or play with shard_scaling.ipynb
+
+# These are back of the envelope calculations, more care went into
+# making sure they are correct, than making them pretty.
 
 using Geodesy
 
@@ -88,8 +94,8 @@ function compute_geo_bw(s::GeoShard)
     dl_user_max = chop((s.up_est*max_sig_rep)/MB, 3)
     dl_all_min = chop((s.down_est*min_rep)/GB, 3)
     dl_all_max = chop((s.down_est*max_sig_rep)/GB, 3)
-    println("Download per user ", dl_user_min, " to ", dl_user_max, " MB")
-    println("Total Download per day ", dl_all_min, " to ", dl_all_max, " GB")
+    # user_min/max in MB, all_min/max in GB
+    return (dl_user_min, dl_user_max, dl_all_min, dl_all_max)
 end
 
 function show_GeoShard(s::GeoShard)
@@ -98,7 +104,9 @@ function show_GeoShard(s::GeoShard)
     #println("Infections per day: ", chop(s.inf_est, 3))
     println("Uploads: ", chop(s.up_est, 3))
     println("Downloads: ", chop(s.down_est, 3))
-    compute_geo_bw(s)
+    umin, umax, amin, amax = compute_geo_bw(s)
+    println("Download per user ", umin , " to ", umax, " MB")
+    println("Total Download per day ", amin, " to ", amax, " GB")
     println()
 end
 
@@ -118,6 +126,11 @@ function compute_all_GeoShards(g::GeoParams, step_angle)
     return(shards)
 end
 
+function equator_shard(g::GeoParams, angle)
+    s = GeoShard(g, LatLon(0, 0), LatLon(0, angle), LatLon(angle, 0), LatLon(angle, angle))
+    return(s)
+end
+
 function large_shard(g::GeoParams)
     println("Shard at equator (large)")
     #   (GeoParams, a, b, c, d)
@@ -129,6 +142,15 @@ function small_shard(g::GeoParams)
     println("Shard at 70 deg (small)")
     s = GeoShard(g, LatLon(70.75,0), LatLon(70.75,0.25), LatLon(71,0), LatLon(71,0.25))
     return(s)
+end
+
+# calculate avg bandwidth per user in a shard on the equator
+function bw(r, a)
+    g = GeoParams(6000, 0.001, r)
+    s = equator_shard(g, a)
+    b1 ,b2 , _, _ = compute_geo_bw(s)
+    b = (b1+b2)/2 #average between min and max report size
+    return(b)
 end
 
 ## Example:
