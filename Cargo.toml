@@ -3,7 +3,7 @@ name = "tcn"
 # Before incrementing version number:
 # - update CHANGELOG.md
 # - update html_root_url
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Henry de Valence <hdevalence@hdevalence.ca>"]
 edition = "2018"
 license = "MIT"
