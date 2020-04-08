@@ -1,5 +1,6 @@
 //! Reference implementation of **Temporary Contact Numbers**, a decentralized,
-//! privacy-first contact tracing protocol developed by [CoEpi] and [CovidWatch].
+//! privacy-first contact tracing protocol developed by the
+//! [TCN Coalition][tcn-coalition].
 //! No personally-identifiable information is required by the
 //! protocol, and although it is compatible with a trusted health authority, it
 //! does not require one. Users' devices send short-range broadcasts over
@@ -15,6 +16,7 @@
 //! [CoEpi]: https://www.coepi.org/
 //! [CovidWatch]: https://www.covid-watch.org/
 //! [README]: https://github.com/TCNCoalition/TCN/blob/main/README.md
+//! [tcn-coalition]: https://tcn-coalition.org/
 //!
 //! # Example
 //!

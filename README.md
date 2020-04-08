@@ -4,11 +4,12 @@
 > and issues.
 
 This document describes **Temporary Contact Numbers**, a decentralized,
-privacy-first contact tracing protocol developed by [CoEpi] and [CovidWatch].
-However, this protocol is not limited to use solely by CoEpi or CovidWatch, and
-is built to be extensible, with the goal of being used more broadly.
-The TCN protocol and related efforts are designed with the [Contact Tracing
-Bill of Rights](/ContactTracingBillOfRights.md) in mind.
+privacy-first contact tracing protocol developed by the [TCN
+Coalition][tcn-coalition].  This protocol is built to be extensible,
+with the goal of providing interoperability between contact tracing
+applications.  The TCN protocol and related efforts are designed with
+the [Contact Tracing Bill of Rights](/ContactTracingBillOfRights.md) in
+mind.
 
 No personally-identifiable information is required by the
 protocol, and although it is compatible with a trusted health authority, it
@@ -354,6 +355,7 @@ repositories.
 
 [CoEpi]: https://www.coepi.org/
 [CovidWatch]: https://www.covid-watch.org/
+[tcn-coalition]: https://tcn-coalition.org/
 
 # Notes (to be merged with main document)
 
