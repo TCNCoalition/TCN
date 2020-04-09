@@ -194,7 +194,7 @@ verification keys of a signature scheme.
 Then it computes the initial *temporary contact key (TCK)* `tck_1` as
 ```
 tck_0 ← H_tck(rak)
-tck_1 ← H_cek(rvk || tck_0)
+tck_1 ← H_tck(rvk || tck_0)
 ```
 Each report can contain at most `2**16` TCNs. `H_tck` is a domain-separated
 hash function with 256 bits of output.
