@@ -484,6 +484,12 @@ same source. To mitigate this attack, TCN rotation needs to be aligned with the
 platform specific rotation of lower level identifiers. TCN rotation frequency can
 be higher than that of other identifiers, but any overlap has to be avoided.
 
+### Shard Carryover Attack
+If a space-time based sharding scheme is used, an attack similar to the
+address carryover attack needs to be mitigated. When switching shards,
+a new keypair should be generated. Otherwise, multiple shards could be linked
+to a single source upon reveal. Simply rotating TCNs is not sufficient here.
+
 ## Counting CEN collisions
 With 128 Bit CENs, at a world population of 8bn, expected total collision count for 
 all legitimately generated CENs from a two week timeframe (revealed and non-revealed), 
