@@ -203,9 +203,7 @@ hash function with 256 bits of output.
 ```
 tck_i ← H_tck(rvk || tck_{i-1}),
 ```
-where `||` denotes concatenation. As noted below, it is crucial that the TCK
-ratchet is synchronized with MAC rotation at the Bluetooth layer to prevent
-linkability attacks.
+where `||` denotes concatenation.
 
 **TCN Generation**. A temporary contact number is derived from a
 temporary contact key by computing
@@ -213,6 +211,11 @@ temporary contact key by computing
 tcn_i ← H_tcn(le_u16(i) || tck_i),
 ```
 where `H_tcn` is a domain-separated hash function with 128 bits of output.
+
+As noted below, it is important that changing of TCNs and therefore the TCK
+ratchet is synchronized with MAC rotation at the Bluetooth layer as much as
+possible to make local linkability attacks as hard as possible.
+
 
 **Diagram**.  The key derivation process is illustrated in the following
 diagram:
@@ -438,17 +441,30 @@ location history.
 Finally, Bluetooth itself exposes a number of tracking opportunities due to the
 handling of MAC addresses and other identifiers. Unfortunately, the degree to
 which these are properly randomized varies considerably across devices, with
-many devices not implementing strong privacy protections. See 
-[this paper](https://arxiv.org/pdf/2003.11511.pdf) for an
-overview on privacy issues. In all cases, the duration for which a TCN lasts
-should be a multiple of the frequency with which MAC address and other
-identifiers in the BLE protocol get randomized. For example, if the MAC address
-changes every minute, then the TCN can change every minute, every 10 seconds,
-or every second. But it cannot change every two minutes or change e.g. every 7
-seconds. In the latter two cases, then when the MAC address changed, the TCN
-would not. Anyone observing (MAC A, TCN 1), then (MAC B, TCN 1), then (MAC B,
-TCN 2) can conclude they are all the same device because all identifiers don’t
-change at the same time. This would entirely compromise Bluetooth privacy. 
+many devices not implementing strong privacy protections. See
+[this paper](https://arxiv.org/pdf/2003.11511.pdf) for an overview on privacy
+issues.
+To avoid making the situation worse, ideally every MAC address change should be
+accompanied by a simultaneous change of the TCN. If this is not done, then
+anyone observing (MAC A, TCN 1), then (MAC B, TCN 1), then (MAC B, TCN 2) can
+conclude they are all the same device because all identifiers don’t change at
+the same time. This makes devices running the TCN protocol more easily trackable
+in a confined area for anyone who can continuously observe their Bluetooth
+signals.
+The extent to which such synchronization is possible is limited by the Bluetooth
+APIs exposed by operating systems. On iOS we know of no way to be notified or
+influence rotation of the Bluetooth MAC address. On Android, experiments show
+that restarting Bluetooth advertising causes a new random MAC address to be
+chosen by the operating system, so instead of reacting to MAC address changes we
+can cause them to happen at the same time as TCN changes.
+(Note that even if TCN changes happen simultaneously with MAC address changes,
+unless rotation of MAC addresses and TCNs is globally synchronized among all
+devices, an adversary who has Bluetooth observations with very fine time
+resolution may still be able to link distinct MAC adresses simply because
+appearance of a new MAC address for a device will closely follow disappearance
+of the old one. This has very little to do with the TCN protocol and is simply a
+consequence of having Bluetooth turned on.)
+
 
 ## Attacks
 
