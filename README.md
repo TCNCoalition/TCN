@@ -439,8 +439,8 @@ Finally, Bluetooth itself exposes a number of tracking opportunities due to the
 handling of MAC addresses and other identifiers. Unfortunately, the degree to
 which these are properly randomized varies considerably across devices, with
 many devices not implementing strong privacy protections. See 
-[this paper](https://arxiv.org/pdf/2003.11511.pdf) for an
-overview on privacy issues. In all cases, the duration for which a TCN lasts
+[this paper](https://petsymposium.org/2019/files/papers/issue3/popets-2019-0036.pdf)
+for an overview on privacy issues. In all cases, the duration for which a CEN lasts
 should be a multiple of the frequency with which MAC address and other
 identifiers in the BLE protocol get randomized. For example, if the MAC address
 changes every minute, then the TCN can change every minute, every 10 seconds,
@@ -469,7 +469,22 @@ false positives as they could with an illegitimate reveal (i.e. they are not
 infected). Since in the above proposal, the validity period of a TCN will be known 
 after a reveal, this attack can only be executed in a short timeframe.
 
-## Counting TCN collisions
-With 128 Bit TCNs, at a world population of 8bn, expected total collision count for 
-all legitimately generated TCNs from a two week timeframe (revealed and non-revealed), 
+### Address Carryover Attack
+An [address-carryover](https://petsymposium.org/2019/files/papers/issue3/popets-2019-0036.pdf)
+is possible when the rotation periods of Bluetooth MAC address and TCN are not
+aligned, as in this figure:
+
+```
+|-------|-------|-------|-------|-------|  BT MAC rotation
+|----|----|----|----|----|----|----|----|  TCN rotation
+```
+
+The attacker could then use the overlap to link multiple identifiers to the
+same source. To mitigate this attack, TCN rotation needs to be aligned with the
+platform specific rotation of lower level identifiers. TCN rotation frequency can
+be higher than that of other identifiers, but any overlap has to be avoided.
+
+## Counting CEN collisions
+With 128 Bit CENs, at a world population of 8bn, expected total collision count for 
+all legitimately generated CENs from a two week timeframe (revealed and non-revealed), 
 without sharding, is ~1.7e-13 (see [`collisions.jl`](./scripts/collisions.jl)).
