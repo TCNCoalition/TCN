@@ -441,8 +441,9 @@ location history.
 Finally, Bluetooth itself exposes a number of tracking opportunities due to the
 handling of MAC addresses and other identifiers. Unfortunately, the degree to
 which these are properly randomized varies considerably across devices, with
-many devices not implementing strong privacy protections. See
-[this paper](https://arxiv.org/pdf/2003.11511.pdf) for an overview on privacy
+many devices not implementing strong privacy protections. See 
+[this paper](https://petsymposium.org/2019/files/papers/issue3/popets-2019-0036.pdf)
+for an overview on privacy
 issues.
 To avoid making the situation worse, ideally every MAC address change should be
 accompanied by a simultaneous change of the TCN. If this is not done, then
@@ -465,7 +466,6 @@ appearance of a new MAC address for a device will closely follow disappearance
 of the old one. This has very little to do with the TCN protocol and is simply a
 consequence of having Bluetooth turned on.)
 
-
 ## Attacks
 
 ### Linkage Attack
@@ -485,7 +485,28 @@ false positives as they could with an illegitimate reveal (i.e. they are not
 infected). Since in the above proposal, the validity period of a TCN will be known 
 after a reveal, this attack can only be executed in a short timeframe.
 
-## Counting TCN collisions
-With 128 Bit TCNs, at a world population of 8bn, expected total collision count for 
-all legitimately generated TCNs from a two week timeframe (revealed and non-revealed), 
+### Address Carryover Attack
+An [address-carryover](https://petsymposium.org/2019/files/papers/issue3/popets-2019-0036.pdf)
+is possible when the rotation periods of Bluetooth MAC address and TCN are not
+aligned, as in this figure:
+
+```
+|-------|-------|-------|-------|-------|  BT MAC rotation
+|----|----|----|----|----|----|----|----|  TCN rotation
+```
+
+The attacker could then use the overlap to link multiple identifiers to the
+same source. To mitigate this attack, TCN rotation needs to be aligned with the
+platform specific rotation of lower level identifiers. TCN rotation frequency can
+be higher than that of other identifiers, but any overlap has to be avoided.
+
+### Shard Carryover Attack
+If a space-time based sharding scheme is used, an attack similar to the
+address carryover attack needs to be mitigated. When switching shards,
+a new keypair should be generated. Otherwise, multiple shards could be linked
+to a single source upon reveal. Simply rotating TCNs is not sufficient here.
+
+## Counting CEN collisions
+With 128 Bit CENs, at a world population of 8bn, expected total collision count for 
+all legitimately generated CENs from a two week timeframe (revealed and non-revealed), 
 without sharding, is ~1.7e-13 (see [`collisions.jl`](./scripts/collisions.jl)).
