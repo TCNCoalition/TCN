@@ -321,17 +321,15 @@ In connection-oriented mode, the peripheral adds a primary service whose UUID is
 
 ### How the Temporary Contact Number (TCN) is Found
 
-Android-Android, iOS-Android: 1 observes 2’s broadcast and reads the value from the advertisement data.
+| Listener OS     | Sender OS         | TCN Communication |
+| --------------- | ----------------- | --- | 
+| Android         | Android           | The Sender broadcasts TCN over Bluetooth. The Listener observes this broadcast directly. |
+| iOS             | Android           | Same as row above. |
+| Android         | iOS               | The Listener signals availability as a Bluetooth peripheral. The Sender, acting as a Bluetooth central, connects to this peripheral and writes its TCN to a field exposed by the peripheral then disconnects. |
+| iOS (background) | iOS (foreground) | The Listener acts as a Bluetooth central. It connects to the Sender, which acts as a peripheral, reads the Sender's exposed TCN field, then disconnects. |
+| iOS (foreground) | iOS (background) | Same as the row above. |
+| iOS (background) | iOS (background) | A nearby Android device acts as a bridge. It receives TCNs through “central” write operations (see 3rd row above) and adds them to a rotating list to broadcast alongside its own TCN. |
 
-Android-iOS: 2 connects to 1 and writes the value of the characteristic and disconnects.
-
-iOS(F)-iOS(B), iOS(B)-iOS(F): 1 connects to 2 and reads the value of the characteristic and disconnects.
-
-iOS(B)-iOS(B): Nearby Android device acts as a bridge: It adds the TCNs received through the characteristic write requests and will advertise those also, while in range.
-
-F = App in Foreground
-
-B = App in Background
 
 Current open-source implementations from CoEpi + Covid Watch generating TCNs locally and covering the communication for each of the above key flows are being developed in the following repositories:
 
