@@ -279,7 +279,7 @@ encoded by the `type` field, which has the following meaning:
 - `0x0`: CoEpi symptom report v1;
 - `0x1`: CovidWatch test result v1;
 - `0x2`: ito report v1;
-- `0x2-0xfe`: reserved for allocations to applications on request;
+- `0x3-0xfe`: reserved for allocations to applications on request;
 - `0xff`: reserved (can be used to add more than 256 types later).
 
 **Parameter Choices**. We implement 
