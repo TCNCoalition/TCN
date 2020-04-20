@@ -1,3 +1,13 @@
+## Objective
+
+The goal of this file is to map out all the concepts from different proposals in a protocol agnostic way. The blocks should be described independently of their implementation. This is done to pave the way for a synthesized protocol containing the best high level ideas.
+
+Then we can express each proposal in terms of composition of a common set of high level blocks. 
+
+We can also synthesize the proposals, by selecting one or more combinations of blocks, and then selecting the best specific implementation for each one.
+
+PRs should be preferably one per (sub)block.
+
 ## Proposals
 
 [Apple/Google](https://www.apple.com/covid19/contacttracing/), 
