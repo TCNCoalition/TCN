@@ -38,7 +38,7 @@ When new TCN coalition members launch their own apps, or launch new partnerships
 
 ## Common TCN API
 
-By implementing the following API, other apps who implement the TCN protocol will be able to fetch report data that was uploaded to other coalition member servers. Further documentation on the API can be found in the [API definition](https://github.com/Co-Epi/coepi-backend-aws/blob/master/api_definition/coepi_api_0.4.0.yml).
+By implementing the following API, other apps who implement the TCN protocol will be able to fetch report data that was uploaded to other coalition member servers. Note that the API doesn't enforce server-to-server nor client-to-server. Rather it is flexible so those architectural decisions can be left to the team implementing the TCN protocol in their app. Further documentation on the API can be found in the [API definition](https://github.com/Co-Epi/coepi-backend-aws/blob/master/api_definition/coepi_api_0.4.0.yml).
 
 ##### API Endpoints
 | Method | Endpoint | Description |
