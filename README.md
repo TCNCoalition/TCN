@@ -340,8 +340,8 @@ the report timespan is a single day, it may be possible for a passive adversary
 to link reports by matching daily routines.
 
 Both of these cases underscore the importance of informed consent by users who
-submit reports.  To reduce the risk of matching daily routines, we suggest a
-report timespan of **6 hours** or less.
+submit reports.  **To reduce the risk of matching daily routines, we suggest a
+report timespan of 6 hours or less.**
 
 Note, however, that this discussion focuses on the case where the report
 contents have little identifying content, for instance the fact of a positive
