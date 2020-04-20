@@ -349,6 +349,8 @@ test result.  If users opt in to self-reporting symptom data, the symptom
 bitflag may be sufficient to link disjoint reports, so users are already opting
 to reveal the information this mechanism aims to protect.
 
+[bluetooth-garbage]: https://gizmodo.com/brave-new-garbage-londons-trash-cans-track-you-using-1071610114
+
 ## TCN sharing with Bluetooth Low Energy
 
 Applications following this protocol use iOS and Android apps' capability to share a 128-bit Temporary Contact Number (TCN) with nearby apps using Bluetooth Low Energy (BLE).
