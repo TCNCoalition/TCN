@@ -190,7 +190,9 @@ only by the server.
 
 **Report Key Generation**. The user-agent creates the *report authorization
 key* `rak` and the *report verification key* `rvk` as the signing and
-verification keys of a signature scheme.
+verification keys of a signature scheme.  These keys will be periodically
+rotated, as described below.
+
 Then it computes the initial *temporary contact key (TCK)* `tck_1` as
 ```
 tck_0 ← H_tck(rak)
@@ -295,6 +297,60 @@ reports of 70-325 bytes, depending on the length of the memo field.
 cargo test generate_test_vectors -- --nocapture
 ```
 
+### Report Timespans and Key Rotation
+
+Because a report allows other users to regenerate a set of TCNs, those TCNs
+become linkable after a report is published, as they are all associated to the
+same report.  This means that the report authorization key should be
+periodically rotated, breaking a user's TCN history into chunks which are
+unlinkable from each other.
+
+If the report authorization key is never rotated, publication of a report could
+allow users or passive adversaries to learn a user's location history (by
+noting multiple observations of TCNs associated to the same report).  On the
+other hand, if the report authorization key is rotated very frequently (e.g.,
+once per TCN), then we are back to the strawman random TCN and the resulting
+scalability problems.  The report rotation interval parameter thus must balance
+privacy and scalability.
+
+Two examples of re-identification attacks at different levels of sophistication
+are, on the one hand, users of a tracing application comparing their
+observations, and on the other, passive adversaries tracking Bluetooth
+broadcasts at scale.
+
+The first case is less serious, because it requires active coordination between
+users, and the end result, being able to infer information about a reporter,
+may be possible anyways, simply by comparing who they have talked to, etc or
+looking at what time an encounter happened and remembering where they were and
+who they were meeting.  Applications may record information like location
+history to help users recall context and assess their risk.  Since identifying
+such exposures is the whole point of the app, recipients can be expected to
+receive and use contextual information for whatever purposes they deem
+appropriate. Any inappropriate use of such information will need to be avoided
+by social, not technological, means. 
+
+However, the second case is a major concern.  Bluetooth tracking is [already
+deployed][bluetooth-garbage] by advertising companies seeking to sell
+information about people's daily routines.  These systems could be easily
+repurposed to record TCNs in attempt to track reporters.  Substantially
+shortening the report timespan reduces this risk, but cannot entirely eliminate
+it.  In particular, if the report timespan is still long enough to cover a
+user's routines, linking disjoint reports may be possible.  For instance, if
+the report timespan is a single day, it may be possible for a passive adversary
+to link reports by matching daily routines.
+
+Both of these cases underscore the importance of informed consent by users who
+submit reports.  **To reduce the risk of matching daily routines, we suggest a
+report timespan of 6 hours or less.**
+
+Note, however, that this discussion focuses on the case where the report
+contents have little identifying content, for instance the fact of a positive
+test result.  If users opt in to self-reporting symptom data, the symptom
+bitflag may be sufficient to link disjoint reports, so users are already opting
+to reveal the information this mechanism aims to protect.
+
+[bluetooth-garbage]: https://gizmodo.com/brave-new-garbage-londons-trash-cans-track-you-using-1071610114
+
 ## TCN sharing with Bluetooth Low Energy
 
 Applications following this protocol use iOS and Android apps' capability to share a 128-bit Temporary Contact Number (TCN) with nearby apps using Bluetooth Low Energy (BLE).
@@ -369,63 +425,6 @@ repositories.
 [Semver]: https://semver.org/
 
 # Notes (to be merged with main document)
-
-## Key rotation and compression factor
-
-One important question is how frequently do we change the [report] key. If it does not
-change, then uploading the key on a positive test reveals all contacts a user
-has ever had, even several months ago. On the other extreme, we could change
-the key every time we generate a TCN, then we are back to the strawman random
-TCN and the resulting scalability problems. What is an appropriate middle
-ground?
-
-## Rotation considerations
-
-The key rotation interval must balance a trade off between security and
-scalability. Consider, for example, rotating keys every day. This should result
-in reasonable amounts of data being uploaded and downloaded. However, it means
-any user who tested positive would associate all the TCNs they broadcast in a
-given day together by revealing the key that generated them. This has two
-consequences: 1) other users could “compare notes” and see if they saw TCNs
-generated by the same key and therefore encountered the same person. 2) The
-user could easily be tracked during that day by anyone who passively listens
-for TCNs and notes their locations. 
-
-Discussions around the first concern concluded it was the less problematic of
-the two attacks. To actively mount the attack would require users to actively
-find each other, collude, and compare data. And the end result is being able to
-infer they had contact with the same person. It is worth noting that this may
-be possible for humans to do on their own in many cases, simply by comparing
-who they have talked to, etc or looking at what time an encounter happened and
-remembering where they were and who they were meeting. It is also likely that
-the CoEpi app will allow users to locally store location history data to assist
-with identifying where a contact occurred, and therefore how likely it was to
-have represented a possible exposure. Since identifying such exposures is the
-whole point of the app, recipients can be expected (by the users reporting
-symptoms or test results) to receive and use such information for whatever
-purposes they deem appropriate. Any inappropriate use of such information will
-need to be avoided by social, not technological, means. 
-
-However, the second issue is a major concern. BLE beacon tracking is already
-used in some settings. Moreover, if contact tracing apps become ubiquitous,
-enterprise solutions for tracking contacts for businesses and public spaces
-will emerge rapidly. This will result in TCNs being recorded in bulk and likely
-aggregated in cloud managed services. In this setting then, linking 24 hours of
-TCNs together will be easy and equivalent to simply revealing a user’s location
-history for that day (if they later report symptoms or a positive test). Worse,
-due to the relative simplicity of re-identification attacks, it should be
-fairly simple to link each 24 hour snippet of a user’s location history
-together to compute a history over a week or more. Substantially shortening the
-interval reduces this risk. It does not completely eliminate it, but as a
-primary defense against BLE beacon tracking, re-keying intervals should be as
-short as feasible. 
-
-Note, however, re-keying is much less of a concern if contacts are made based
-on symptom reports. If users are notified of the contact and their symptoms,
-and the symptom descriptors are reasonably unique, then with high probability
-all TCNs which have a report containing the same symptoms are from the same
-user. This is the same information that would be leaked by using a long
-rekeying interval.
 
 ## Further considerations
 
