@@ -38,7 +38,7 @@ When new TCN coalition members launch their own apps, or launch new partnerships
 
 ## Common TCN API
 
-By implementing the following API, other apps who implement the TCN protocol will be able to fetch report data that was uploaded to other coalition member servers. Note that the API doesn't enforce server-to-server nor client-to-server. Rather it is flexible so those architectural decisions can be left to the team implementing the TCN protocol in their app.
+By implementing the following API, other apps who implement the TCN protocol will be able to fetch report data that was uploaded to other coalition member servers. **Note that the API doesn't enforce server-to-server nor client-to-server.** Rather it is flexible so those architectural decisions can be left to the team implementing the TCN protocol in their app.
 
 Further documentation on the API can be found in the [API definition](https://github.com/Co-Epi/coepi-backend-aws/blob/master/api_definition/coepi_api_0.4.0.yml).
 > Note: this link needs to be updated to point to a reference implementation on the TCN repo when we get there.
@@ -46,14 +46,14 @@ Further documentation on the API can be found in the [API definition](https://gi
 ##### API Endpoints
 | Method | Endpoint | Description |
 | ------ | ------------ | ------------------------ |
-| GET | /tcnreport | Returns a list of reports ('rvk \|\| tck_{j1-1} \|\| le_u16(j1) \|\| le_u16(j2) \|\| memo', refer to the [TCN protocol](https://github.com/TCNCoalition/TCN/blob/main/README.md)) concatenated together for a given time interval number. |
+| GET | /tcnreport | Returns a list of **signed** reports ('rvk \|\| tck_{j1-1} \|\| le_u16(j1) \|\| le_u16(j2) \|\| memo', refer to the [TCN protocol](https://github.com/TCNCoalition/TCN/blob/main/README.md)) concatenated together for a given time interval number. |
 
 ##### Query Parameters
 | Name | Description |
 | -------- | ---------------------- |
-| date | Date in RFC3339 standard in UTC, without the time component. If not provided, default value of today's date is used |
-| intervalNumber | Positive integer that corresponds to a specific fixed time interval and can be calculated as (unix_time / time_interval_ms) |
-| intervalLengthMs | The interval length in milliseconds used by the client to calculate intervalNumber. The server will respond with a 401 if the interval length does not match the expected length. |
+| intervalNumber | **Required:** Positive integer that corresponds to a specific fixed time interval and can be calculated as (unix_time / time_interval_ms) |
+| date | **Optional:** Date in RFC3339 standard in UTC, without the time component. If not provided, default value of today's date is used |
+| intervalLengthMs | **Optional:** The interval length in milliseconds used by the client to calculate intervalNumber. The server will respond with a 401 if the interval length does not match the expected length. |
 
 # User experience
 
