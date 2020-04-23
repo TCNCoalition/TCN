@@ -51,9 +51,9 @@ Further documentation on the API can be found in the [API definition](https://gi
 ##### Query Parameters
 | Name | Description |
 | -------- | ---------------------- |
-| intervalNumber | **Required:** Positive integer that corresponds to a specific fixed time interval and can be calculated as (unix_time / time_interval_ms) |
 | date | **Optional:** Date in RFC3339 standard in UTC, without the time component. If not provided, default value of today's date is used |
-| intervalLengthMs | **Optional:** The interval length in milliseconds used by the client to calculate intervalNumber. The server will respond with a 401 if the interval length does not match the expected length. |
+| intervalNumber | **Optional:** Positive integer that corresponds to a specific fixed time interval and can be calculated as (unix_time / time_interval_ms). If no value for *intervalNumber* is supplied, the default is the most recent interval. If a value for *intervalNumber* **is** supplied, then the *intervalLengthMs* parameter is **required**. |
+| intervalLengthMs | **Optional (unless *intervalNumber* is specified, then required):** The interval length in milliseconds used by the client to calculate intervalNumber. The server will respond with a 401 if the interval length does not match the expected length. |
 
 # User experience
 
