@@ -35,7 +35,7 @@ fn generate_temporary_contact_numbers_and_report_them() {
 
     // Check that the recomputed TCNs match the originals.
     // The slice is offset by 1 because tcn_0 is not included.
-    assert_eq!(&recomputed_tcns[..], &tcns[20 - 1..90 - 1]);
+    assert_eq!(&recomputed_tcns[..], &tcns[20 + 1..90]);
 }
 
 #[test]

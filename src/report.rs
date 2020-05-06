@@ -41,7 +41,7 @@ impl Report {
     pub fn temporary_contact_numbers(&self) -> impl Iterator<Item = TemporaryContactNumber> {
         let mut tck = TemporaryContactKey {
             // Does not underflow as j_1 > 0.
-            index: self.j_1 - 1,
+            index: self.j_1,
             rvk: self.rvk,
             tck_bytes: self.tck_bytes,
         };
@@ -85,13 +85,14 @@ impl ReportAuthorizationKey {
         j_2: u16,
     ) -> Result<SignedReport, Error> {
         // Ensure that j_1 is at least 1.
-        let j_1 = if j_1 == 0 { 1 } else { j_1 };
+        let j_1 = j_1 + 1;
 
         // Recompute tck_{j_1-1}. This requires recomputing j_1-1 hashes, but
         // creating reports is done infrequently and it means we don't force the
         // caller to have saved all intermediate hashes.
         let mut tck = self.tck_0();
-        for _ in 0..(j_1 - 1) {
+
+        for _ in 0..j_1 {
             tck = tck.ratchet().expect("j_1 - 1 < u16::MAX");
         }
 
