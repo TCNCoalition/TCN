@@ -118,7 +118,8 @@ impl ReportAuthorizationKey {
 #[derive(Clone, Debug)]
 pub struct SignedReport {
     pub(crate) report: Report,
-    pub(crate) sig: ed25519_zebra::Signature,
+    /// The report's signature
+    pub sig: ed25519_zebra::Signature,
 }
 
 impl SignedReport {
