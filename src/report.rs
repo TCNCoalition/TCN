@@ -48,11 +48,13 @@ impl Report {
         // Ratchet to obtain tck_{j_1}.
         tck = tck.ratchet().expect("j_1 - 1 < j_1 <= u16::MAX");
 
-        (self.j_1..self.j_2).map(move |_| {
+        (self.j_1..=self.j_2).map(move |j| {
             let tcn = tck.temporary_contact_number();
-            tck = tck
-                .ratchet()
-                .expect("we do not ratchet past j_2 <= u16::MAX");
+            if j < u16::MAX {
+                tck = tck
+                    .ratchet()
+                    .expect("we do not ratchet past j_2 <= u16::MAX");
+            }
             tcn
         })
     }
