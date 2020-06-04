@@ -210,7 +210,7 @@ fn report_with_j1_1_and_j2_1_generates_one_tcn() {
     let rak = ReportAuthorizationKey::new(rand::thread_rng());
 
     let signed_report = rak
-        .create_report(MemoType::CoEpiV1, b"symptom data".to_vec(), 0, 1)
+        .create_report(MemoType::CoEpiV1, b"symptom data".to_vec(), 1, 1)
         .expect("Report creation can only fail if the memo data is too long");
 
     let report = signed_report
