@@ -1,5 +1,4 @@
 use tcn::*;
-use std:: sync::Arc;
 
 #[test]
 fn generate_temporary_contact_numbers_and_report_them() {
@@ -260,7 +259,7 @@ fn report_with_j2_max_and_j1_max_minus_1_generates_2_tcns() {
     assert_eq!(recomputed_tcns.len(), 2);
 }
 
-fn tcn_generation_test_helper(rak: ReportAuthorizationKey, tcns: Arc<Vec<TemporaryContactNumber>>, j_1: u16, j_2: u16){
+fn tcn_generation_test_helper(rak: ReportAuthorizationKey, tcns: &Vec<TemporaryContactNumber>, j_1: u16, j_2: u16){
     println!("j_1 = {}; j_2 = {};", j_1, j_2);
 
     // Prepare a report about a subset of the temporary contact numbers.
@@ -316,14 +315,13 @@ fn report_creation_index_boundaries_check(){
     }
 
     println!("generated tcns count: {}", tcns.len());
-    let arced_tcns = Arc::new(tcns);
 
-    tcn_generation_test_helper(rak, arced_tcns.clone(),0, 1);
-    tcn_generation_test_helper(rak, arced_tcns.clone(),1, 1);
-    tcn_generation_test_helper(rak, arced_tcns.clone(),1, 2);
-    tcn_generation_test_helper(rak, arced_tcns.clone(),1, 200);
-    tcn_generation_test_helper(rak, arced_tcns.clone(),20, 90);
-    tcn_generation_test_helper(rak, arced_tcns.clone(),20000, 30000);
-    tcn_generation_test_helper(rak, arced_tcns.clone(),u16::MAX - 1, u16::MAX);
-    tcn_generation_test_helper(rak, arced_tcns.clone(),u16::MAX, u16::MAX);
+    tcn_generation_test_helper(rak, &tcns,0, 1);
+    tcn_generation_test_helper(rak, &tcns,1, 1);
+    tcn_generation_test_helper(rak, &tcns,1, 2);
+    tcn_generation_test_helper(rak, &tcns,1, 200);
+    tcn_generation_test_helper(rak, &tcns,20, 90);
+    tcn_generation_test_helper(rak, &tcns,20000, 30000);
+    tcn_generation_test_helper(rak, &tcns,u16::MAX - 1, u16::MAX);
+    tcn_generation_test_helper(rak, &tcns,u16::MAX, u16::MAX);
 }
