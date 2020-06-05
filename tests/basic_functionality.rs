@@ -325,3 +325,33 @@ fn report_creation_index_boundaries_check(){
     tcn_generation_test_helper(rak, &tcns,u16::MAX - 1, u16::MAX);
     tcn_generation_test_helper(rak, &tcns,u16::MAX, u16::MAX);
 }
+
+#[test]
+#[should_panic(expected = "Report creation can only fail if the memo data is too long")]
+fn memo_data_too_long(){
+    let rak = ReportAuthorizationKey::new(rand::thread_rng());
+
+    let mut memo_vec = Vec::new();
+    for i  in 0..u8::MAX {
+        memo_vec.push(i);
+        // memo_vec.push(i);
+    }
+    //Increase memo vector to len 256:
+    memo_vec.push(1);
+    println!("memo_vec len: {}", memo_vec.len());
+
+    let signed_report = rak
+        .create_report(
+            MemoType::CoEpiV1,
+            memo_vec,
+            u16::MAX - 1,
+            u16::MAX,
+        )
+        .expect("Report creation can only fail if the memo data is too long");
+
+
+    // Verify the source integrity of the report...
+    let _report = signed_report
+        .verify()
+        .expect("Valid reports should verify correctly");
+}
