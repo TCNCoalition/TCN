@@ -35,7 +35,7 @@ fn generate_temporary_contact_numbers_and_report_them() {
 
     // Check that the recomputed TCNs match the originals.
     // The slice is offset by 1 because tcn_0 is not included.
-    assert_eq!(&recomputed_tcns[..], &tcns[20 - 1..90 - 1]);
+    assert_eq!(&recomputed_tcns[..], &tcns[20 - 1..90]);
 }
 
 #[test]
@@ -187,4 +187,73 @@ fn basic_read_write_round_trip() {
         .write(Cursor::new(&mut buf2))
         .expect("writing should succeed");
     assert_eq!(buf1, buf2);
+}
+
+#[test]
+fn report_with_j1_0_and_j2_1_generates_one_tcn() {
+    let rak = ReportAuthorizationKey::new(rand::thread_rng());
+
+    let signed_report = rak
+        .create_report(MemoType::CoEpiV1, b"symptom data".to_vec(), 0, 1)
+        .expect("Report creation can only fail if the memo data is too long");
+
+    let report = signed_report
+        .verify()
+        .expect("Valid reports should verify correctly");
+
+    let recomputed_tcns = report.temporary_contact_numbers().collect::<Vec<_>>();
+    assert_eq!(recomputed_tcns.len(), 1);
+}
+
+#[test]
+fn report_with_j1_1_and_j2_1_generates_one_tcn() {
+    let rak = ReportAuthorizationKey::new(rand::thread_rng());
+
+    let signed_report = rak
+        .create_report(MemoType::CoEpiV1, b"symptom data".to_vec(), 1, 1)
+        .expect("Report creation can only fail if the memo data is too long");
+
+    let report = signed_report
+        .verify()
+        .expect("Valid reports should verify correctly");
+
+    let recomputed_tcns = report.temporary_contact_numbers().collect::<Vec<_>>();
+    assert_eq!(recomputed_tcns.len(), 1);
+}
+
+#[test]
+fn report_with_j1_1_and_j2_2_generates_2_tcns() {
+    let rak = ReportAuthorizationKey::new(rand::thread_rng());
+
+    let signed_report = rak
+        .create_report(MemoType::CoEpiV1, b"symptom data".to_vec(), 1, 2)
+        .expect("Report creation can only fail if the memo data is too long");
+
+    let report = signed_report
+        .verify()
+        .expect("Valid reports should verify correctly");
+
+    let recomputed_tcns = report.temporary_contact_numbers().collect::<Vec<_>>();
+    assert_eq!(recomputed_tcns.len(), 2);
+}
+
+#[test]
+fn report_with_j2_max_and_j1_max_minus_1_generates_2_tcns() {
+    let rak = ReportAuthorizationKey::new(rand::thread_rng());
+
+    let signed_report = rak
+        .create_report(
+            MemoType::CoEpiV1,
+            b"symptom data".to_vec(),
+            u16::MAX - 1,
+            u16::MAX,
+        )
+        .expect("Report creation can only fail if the memo data is too long");
+
+    let report = signed_report
+        .verify()
+        .expect("Valid reports should verify correctly");
+
+    let recomputed_tcns = report.temporary_contact_numbers().collect::<Vec<_>>();
+    assert_eq!(recomputed_tcns.len(), 2);
 }
