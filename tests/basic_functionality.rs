@@ -260,8 +260,6 @@ fn report_with_j2_max_and_j1_max_minus_1_generates_2_tcns() {
 }
 
 fn tcn_generation_test_helper(rak: ReportAuthorizationKey, tcns: &Vec<TemporaryContactNumber>, j_1: u16, j_2: u16){
-    println!("j_1 = {}; j_2 = {};", j_1, j_2);
-
     // Prepare a report about a subset of the temporary contact numbers.
     let signed_report = rak
         .create_report(
@@ -285,12 +283,7 @@ fn tcn_generation_test_helper(rak: ReportAuthorizationKey, tcns: &Vec<TemporaryC
     // The slice is offset by 1 because tcn_0 is not included.
     let u_1 : usize = if j_1 > 0 {j_1 as usize -1 } else {0};
     let u_2 = j_2 as usize -1 ;
-    println!("u_1 = {}; u_2 = {};", u_1, u_2);
 
-    println!("tcns[u_1]: {:?}", tcns[u_1]);
-    println!("tcns[u_2]: {:?}", tcns[u_2]);
-    println!("&tcns[u_1..=u_2] len: {:?}", &tcns[u_1..=u_2].len());
-    println!("&tcns[u_1..=u_2]: {:?}", &tcns[u_1..=u_2]);
     // Verify vector equality
     assert_eq!(&recomputed_tcns[..], &tcns[u_1..=u_2]);
 }
