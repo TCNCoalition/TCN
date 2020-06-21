@@ -259,14 +259,19 @@ fn report_with_j2_max_and_j1_max_minus_1_generates_2_tcns() {
     assert_eq!(recomputed_tcns.len(), 2);
 }
 
-fn tcn_generation_test_helper(rak: ReportAuthorizationKey, tcns: &Vec<TemporaryContactNumber>, j_1: u16, j_2: u16){
+fn tcn_generation_test_helper(
+    rak: ReportAuthorizationKey,
+    tcns: &Vec<TemporaryContactNumber>,
+    j_1: u16,
+    j_2: u16,
+) {
     // Prepare a report about a subset of the temporary contact numbers.
     let signed_report = rak
         .create_report(
             MemoType::CoEpiV1,        // The memo type
             b"symptom data".to_vec(), // The memo data
-            j_1,                       // Index of the first TCN to disclose
-            j_2,                       // Index of the last TCN to check
+            j_1,                      // Index of the first TCN to disclose
+            j_2,                      // Index of the last TCN to check
         )
         .expect("Report creation can only fail if the memo data is too long");
 
@@ -281,16 +286,15 @@ fn tcn_generation_test_helper(rak: ReportAuthorizationKey, tcns: &Vec<TemporaryC
 
     // Check that the recomputed TCNs match the originals.
     // The slice is offset by 1 because tcn_0 is not included.
-    let u_1 : usize = if j_1 > 0 {j_1 as usize -1 } else {0};
-    let u_2 = j_2 as usize -1 ;
+    let u_1: usize = if j_1 > 0 { j_1 as usize - 1 } else { 0 };
+    let u_2 = j_2 as usize - 1;
 
     // Verify vector equality
     assert_eq!(&recomputed_tcns[..], &tcns[u_1..=u_2]);
 }
 
 #[test]
-fn report_creation_index_boundaries_check(){
-
+fn report_creation_index_boundaries_check() {
     // Generate a report authorization key.  This key represents the capability
     // to publish a report about a collection of derived temporary contact numbers.
     let rak = ReportAuthorizationKey::new(rand::thread_rng());
@@ -304,28 +308,28 @@ fn report_creation_index_boundaries_check(){
         tcns.push(tck.temporary_contact_number());
         if let Some(new_tck) = tck.ratchet() {
             tck = new_tck;
-        } 
+        }
     }
 
     println!("generated tcns count: {}", tcns.len());
 
-    tcn_generation_test_helper(rak, &tcns,0, 1);
-    tcn_generation_test_helper(rak, &tcns,1, 1);
-    tcn_generation_test_helper(rak, &tcns,1, 2);
-    tcn_generation_test_helper(rak, &tcns,1, 200);
-    tcn_generation_test_helper(rak, &tcns,20, 90);
-    tcn_generation_test_helper(rak, &tcns,20000, 30000);
-    tcn_generation_test_helper(rak, &tcns,u16::MAX - 1, u16::MAX);
-    tcn_generation_test_helper(rak, &tcns,u16::MAX, u16::MAX);
+    tcn_generation_test_helper(rak, &tcns, 0, 1);
+    tcn_generation_test_helper(rak, &tcns, 1, 1);
+    tcn_generation_test_helper(rak, &tcns, 1, 2);
+    tcn_generation_test_helper(rak, &tcns, 1, 200);
+    tcn_generation_test_helper(rak, &tcns, 20, 90);
+    tcn_generation_test_helper(rak, &tcns, 20000, 30000);
+    tcn_generation_test_helper(rak, &tcns, u16::MAX - 1, u16::MAX);
+    tcn_generation_test_helper(rak, &tcns, u16::MAX, u16::MAX);
 }
 
 #[test]
 #[should_panic(expected = "Report creation can only fail if the memo data is too long")]
-fn memo_data_too_long(){
+fn memo_data_too_long() {
     let rak = ReportAuthorizationKey::new(rand::thread_rng());
 
     let mut memo_vec = Vec::new();
-    for i  in 0..u8::MAX {
+    for i in 0..u8::MAX {
         memo_vec.push(i);
         // memo_vec.push(i);
     }
@@ -334,14 +338,8 @@ fn memo_data_too_long(){
     println!("memo_vec len: {}", memo_vec.len());
 
     let signed_report = rak
-        .create_report(
-            MemoType::CoEpiV1,
-            memo_vec,
-            u16::MAX - 1,
-            u16::MAX,
-        )
+        .create_report(MemoType::CoEpiV1, memo_vec, u16::MAX - 1, u16::MAX)
         .expect("Report creation can only fail if the memo data is too long");
-
 
     // Verify the source integrity of the report...
     let _report = signed_report
