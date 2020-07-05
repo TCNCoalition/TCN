@@ -189,75 +189,6 @@ fn basic_read_write_round_trip() {
     assert_eq!(buf1, buf2);
 }
 
-#[test]
-fn report_with_j1_0_and_j2_1_generates_one_tcn() {
-    let rak = ReportAuthorizationKey::new(rand::thread_rng());
-
-    let signed_report = rak
-        .create_report(MemoType::CoEpiV1, b"symptom data".to_vec(), 0, 1)
-        .expect("Report creation can only fail if the memo data is too long");
-
-    let report = signed_report
-        .verify()
-        .expect("Valid reports should verify correctly");
-
-    let recomputed_tcns = report.temporary_contact_numbers().collect::<Vec<_>>();
-    assert_eq!(recomputed_tcns.len(), 1);
-}
-
-#[test]
-fn report_with_j1_1_and_j2_1_generates_one_tcn() {
-    let rak = ReportAuthorizationKey::new(rand::thread_rng());
-
-    let signed_report = rak
-        .create_report(MemoType::CoEpiV1, b"symptom data".to_vec(), 1, 1)
-        .expect("Report creation can only fail if the memo data is too long");
-
-    let report = signed_report
-        .verify()
-        .expect("Valid reports should verify correctly");
-
-    let recomputed_tcns = report.temporary_contact_numbers().collect::<Vec<_>>();
-    assert_eq!(recomputed_tcns.len(), 1);
-}
-
-#[test]
-fn report_with_j1_1_and_j2_2_generates_2_tcns() {
-    let rak = ReportAuthorizationKey::new(rand::thread_rng());
-
-    let signed_report = rak
-        .create_report(MemoType::CoEpiV1, b"symptom data".to_vec(), 1, 2)
-        .expect("Report creation can only fail if the memo data is too long");
-
-    let report = signed_report
-        .verify()
-        .expect("Valid reports should verify correctly");
-
-    let recomputed_tcns = report.temporary_contact_numbers().collect::<Vec<_>>();
-    assert_eq!(recomputed_tcns.len(), 2);
-}
-
-#[test]
-fn report_with_j2_max_and_j1_max_minus_1_generates_2_tcns() {
-    let rak = ReportAuthorizationKey::new(rand::thread_rng());
-
-    let signed_report = rak
-        .create_report(
-            MemoType::CoEpiV1,
-            b"symptom data".to_vec(),
-            u16::MAX - 1,
-            u16::MAX,
-        )
-        .expect("Report creation can only fail if the memo data is too long");
-
-    let report = signed_report
-        .verify()
-        .expect("Valid reports should verify correctly");
-
-    let recomputed_tcns = report.temporary_contact_numbers().collect::<Vec<_>>();
-    assert_eq!(recomputed_tcns.len(), 2);
-}
-
 fn tcns_recompute_and_compare(
     rak: ReportAuthorizationKey,
     tcns: &Vec<TemporaryContactNumber>,
@@ -291,60 +222,6 @@ fn tcns_recompute_and_compare(
     // Verify vector equality
     assert_eq!(&recomputed_tcns[..], &tcns[u_1..=u_2]);
 }
-
-/*
-fn tcn_recompute_and_compare(
-    rak: ReportAuthorizationKey,
-    tcns: &Vec<TemporaryContactNumber>,
-    j_1: u16,
-    j_2: u16,
-){
-    let recomputed_tcns = tcns_recompute(rak, j_1, j_2);
-    compare_tcn_vectors(tcns, j_1, j_2, &recomputed_tcns);
-}
-
-fn tcns_recompute (
-    rak: ReportAuthorizationKey,
-    j_1: u16,
-    j_2: u16,
-) -> Vec<TemporaryContactNumber> {
-    // Prepare a report about a subset of the temporary contact numbers.
-    let signed_report = rak
-        .create_report(
-            MemoType::CoEpiV1,        // The memo type
-            b"symptom data".to_vec(), // The memo data
-            j_1,                      // Index of the first TCN to disclose
-            j_2,                      // Index of the last TCN to check
-        )
-        .expect("Report creation can only fail if the memo data is too long");
-
-    // Verify the source integrity of the report...
-    let _report = signed_report
-        .verify()
-        .expect("Valid reports should verify correctly");
-
-    // ...allowing the disclosed TCNs to be recomputed.
-    let recomputed_tcns = _report.temporary_contact_numbers().collect::<Vec<_>>();
-    println!("recomputed_tcns count: {}", recomputed_tcns.len());
-    recomputed_tcns
-}
-
-fn compare_tcn_vectors(
-    original_tcns: &Vec<TemporaryContactNumber>,
-    j_1: u16,
-    j_2: u16,
-    recomputed_tcns: &Vec<TemporaryContactNumber>,
-){
-    // Check that the recomputed TCNs match the originals.
-    // The slice is offset by 1 because tcn_0 is not included.
-    let u_1: usize = if j_1 > 0 { j_1 as usize - 1 } else { 0 };
-    let u_2 = j_2 as usize - 1;
-
-    // Verify vector equality
-    assert_eq!(&recomputed_tcns[..], &original_tcns[u_1..=u_2]);
-}
-*/
-
 
 
 #[test]
