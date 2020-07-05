@@ -35,7 +35,6 @@ fn generate_temporary_contact_numbers_and_report_them() {
 
     // Check that the recomputed TCNs match the originals.
     // The slice is offset by 1 because tcn_0 is not included.
-    println!("&tcns[20 - 1..90] len: {:?}", &tcns[20 - 1..90].len());
     assert_eq!(&recomputed_tcns[..], &tcns[20 - 1..90]);
 }
 
@@ -259,7 +258,7 @@ fn report_with_j2_max_and_j1_max_minus_1_generates_2_tcns() {
     assert_eq!(recomputed_tcns.len(), 2);
 }
 
-fn tcn_generation_test_helper(
+fn tcns_recompute_and_compare(
     rak: ReportAuthorizationKey,
     tcns: &Vec<TemporaryContactNumber>,
     j_1: u16,
@@ -293,6 +292,61 @@ fn tcn_generation_test_helper(
     assert_eq!(&recomputed_tcns[..], &tcns[u_1..=u_2]);
 }
 
+/*
+fn tcn_recompute_and_compare(
+    rak: ReportAuthorizationKey,
+    tcns: &Vec<TemporaryContactNumber>,
+    j_1: u16,
+    j_2: u16,
+){
+    let recomputed_tcns = tcns_recompute(rak, j_1, j_2);
+    compare_tcn_vectors(tcns, j_1, j_2, &recomputed_tcns);
+}
+
+fn tcns_recompute (
+    rak: ReportAuthorizationKey,
+    j_1: u16,
+    j_2: u16,
+) -> Vec<TemporaryContactNumber> {
+    // Prepare a report about a subset of the temporary contact numbers.
+    let signed_report = rak
+        .create_report(
+            MemoType::CoEpiV1,        // The memo type
+            b"symptom data".to_vec(), // The memo data
+            j_1,                      // Index of the first TCN to disclose
+            j_2,                      // Index of the last TCN to check
+        )
+        .expect("Report creation can only fail if the memo data is too long");
+
+    // Verify the source integrity of the report...
+    let _report = signed_report
+        .verify()
+        .expect("Valid reports should verify correctly");
+
+    // ...allowing the disclosed TCNs to be recomputed.
+    let recomputed_tcns = _report.temporary_contact_numbers().collect::<Vec<_>>();
+    println!("recomputed_tcns count: {}", recomputed_tcns.len());
+    recomputed_tcns
+}
+
+fn compare_tcn_vectors(
+    original_tcns: &Vec<TemporaryContactNumber>,
+    j_1: u16,
+    j_2: u16,
+    recomputed_tcns: &Vec<TemporaryContactNumber>,
+){
+    // Check that the recomputed TCNs match the originals.
+    // The slice is offset by 1 because tcn_0 is not included.
+    let u_1: usize = if j_1 > 0 { j_1 as usize - 1 } else { 0 };
+    let u_2 = j_2 as usize - 1;
+
+    // Verify vector equality
+    assert_eq!(&recomputed_tcns[..], &original_tcns[u_1..=u_2]);
+}
+*/
+
+
+
 #[test]
 fn report_creation_index_boundaries_check() {
     // Generate a report authorization key.  This key represents the capability
@@ -313,14 +367,15 @@ fn report_creation_index_boundaries_check() {
 
     println!("generated tcns count: {}", tcns.len());
 
-    tcn_generation_test_helper(rak, &tcns, 0, 1);
-    tcn_generation_test_helper(rak, &tcns, 1, 1);
-    tcn_generation_test_helper(rak, &tcns, 1, 2);
-    tcn_generation_test_helper(rak, &tcns, 1, 200);
-    tcn_generation_test_helper(rak, &tcns, 20, 90);
-    tcn_generation_test_helper(rak, &tcns, 20000, 30000);
-    tcn_generation_test_helper(rak, &tcns, u16::MAX - 1, u16::MAX);
-    tcn_generation_test_helper(rak, &tcns, u16::MAX, u16::MAX);
+    tcns_recompute_and_compare(rak, &tcns, 0, 1);
+    tcns_recompute_and_compare(rak, &tcns, 1, 1);
+    tcns_recompute_and_compare(rak, &tcns, 1, 2);
+    tcns_recompute_and_compare(rak, &tcns, 1, 200);
+    tcns_recompute_and_compare(rak, &tcns, 20, 90);
+    tcns_recompute_and_compare(rak, &tcns, 20000, 30000);
+    tcns_recompute_and_compare(rak, &tcns, u16::MAX - 1, u16::MAX);
+    tcns_recompute_and_compare(rak, &tcns, u16::MAX, u16::MAX);
+
 }
 
 #[test]
@@ -331,7 +386,6 @@ fn memo_data_too_long() {
     let mut memo_vec = Vec::new();
     for i in 0..u8::MAX {
         memo_vec.push(i);
-        // memo_vec.push(i);
     }
     //Increase memo vector to len 256:
     memo_vec.push(1);
