@@ -223,7 +223,6 @@ fn tcns_recompute_and_compare(
     assert_eq!(&recomputed_tcns[..], &tcns[u_1..=u_2]);
 }
 
-
 #[test]
 fn report_creation_index_boundaries_check() {
     // Generate a report authorization key.  This key represents the capability
@@ -252,7 +251,6 @@ fn report_creation_index_boundaries_check() {
     tcns_recompute_and_compare(rak, &tcns, 20000, 30000);
     tcns_recompute_and_compare(rak, &tcns, u16::MAX - 1, u16::MAX);
     tcns_recompute_and_compare(rak, &tcns, u16::MAX, u16::MAX);
-
 }
 
 #[test]
