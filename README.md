@@ -6,7 +6,7 @@
 This document describes **Temporary Contact Numbers**, a decentralized,
 privacy-first contact tracing protocol developed by the [TCN
 Coalition][tcn-coalition].  This protocol is built to be extensible,
-with the goal of providing interoperability between contact tracing
+with the goal of providing interoperability between exposure notification
 applications.  The TCN protocol and related efforts are designed with
 the [Contact Tracing Bill of Rights](/ContactTracingBillOfRights.md) in
 mind.
@@ -22,9 +22,7 @@ used with either verified test results or for self-reported symptoms via an
 extensible report memo field.
 
 PRs and Issues are welcome to be submitted directly to this repo. For questions
-about the TCN Protocol or collaborating in more detail, contact
-[Henry](mailto:hdevalence@hdevalence.ca?Subject=TCN%20Protocol) or
-[Dana](mailto:dana+CoEpi@OpenAPS.org?Subject=TCN%20Protocol).
+about the TCN Protocol or using the TCN Protocol, please [create an issue](https://github.com/TCNCoalition/TCN/issues/new). 
 
 This repository also contains a reference implementation of the TCN protocol
 written in Rust. View documentation by running `cargo doc --no-deps --open`,
@@ -36,7 +34,7 @@ Changes can be found in [`CHANGELOG.md`](./CHANGELOG.md).
 **What's on this page:**
 
 - [Introduction](#tcn-protocol)
-- [Ideal functionality and trust assumptions in contact tracing systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
+- [Ideal functionality and trust assumptions in exposure notification systems](#ideal-functionality-and-trust-assumptions-in-contact-tracing-systems)
 - [A strawman protocol](#a-strawman-protocol)
 - [The TCN Protocol](#the-tcn-protocol)
 - [TCN sharing with Bluetooth Low Energy](#tcn-sharing-with-bluetooth-low-energy)
@@ -45,14 +43,14 @@ Changes can be found in [`CHANGELOG.md`](./CHANGELOG.md).
 As it is a work-in-progress, this page also contains [rough notes, yet to be
 merged with the main document](#notes-to-be-merged-with-main-document).
 
-## Ideal functionality and trust assumptions in contact tracing systems
+## Ideal functionality and trust assumptions in exposure notification systems
 
 Cryptography builds systems that mediate and rearrange trust, so before
-beginning discussion of cryptographic approaches to contact tracing, it's
+beginning discussion of cryptographic approaches to exposure notification, it's
 worthwhile to delineate categories of trust involved in the problem.
 
 1.  **Location Privacy**.  Is any party trusted with access to location data,
-    and if so, under what circumstances?  Because a contact tracing system
+    and if so, under what circumstances?  Because an exposure notification system
     allows users to report potential exposure to other users, this category can
     be usefully subdivided into *reporter privacy* and *receiver privacy*.
 
@@ -92,6 +90,7 @@ with health authorities that verify report integrity (e.g., by sending
 reports to a portal that signs them on behalf of the health authority or
 allowing the authorities to generate URLs that pass an authenticated
 positive diagnosis result to an app).
+
 Leaving the question of report integrity as an application-level concern
 means that different applications can make different choices, while still
 remaining interoperable. For instance, [CoEpi] allows users to self-report
@@ -99,7 +98,7 @@ symptoms, while [CovidWatch] trusts a health authority to attest to the
 integrity of a positive test status.
 
 This analysis lets us describe the structure and ideal functionality of a
-contact tracing protocol. The protocol's interactions should fit into the
+exposure notification protocol. The protocol's interactions should fit into the
 following phases:
 
 - **Broadcast**: users generate and broadcast Temporary Contact Numbers
@@ -404,7 +403,7 @@ repositories.
 
 ## References and Further Reading
 
-- [Shared research document tracking privacy-preserving contact tracing mechanisms](https://docs.google.com/document/d/16Kh4_Q_tmyRh0-v452wiul9oQAiTRj8AdZ5vcOJum9Y/edit#).
+- [Shared research document tracking privacy-preserving exposure notification mechanisms](https://docs.google.com/document/d/16Kh4_Q_tmyRh0-v452wiul9oQAiTRj8AdZ5vcOJum9Y/edit#).
 
 ## Contributors
 
