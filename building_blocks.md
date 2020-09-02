@@ -18,22 +18,31 @@ PRs should be preferably one per (sub)block.
 
 Neither the list of proposals, nor of the  building blocks claims to be complete. Contributions are very welcome, to enable convergence of protocols.
 
+## Glossary
+
+| General                       | A/G                                 | DP-3T                           | PACT (MIT)            | PACT (UW)            | TCN                            |
+|-------------------------------|-------------------------------------|---------------------------------|-----------------------|----------------------|--------------------------------|
+| Pseudorandom Identifier (PID) | Rolling Proximity ID (RPI)          | Ephemeral ID (EphID)            | chirp (r<sub>t</sub>) | Pseudorandom ID (id) | Temporary Contact Number (tcn) |
+| Interval Secret (IS)          | Daily Tracing Key (dtk<sub>i</sub>) | Secret Day Key (SK<sub>t</sub>) | seed (s)              | seed (S<sub>0</sub>) | Temporary Contact Key (tck)    |
+| Interval Secret rotation      | daily                               | daily                           | hourly                | variable             | variable                       |
+
+
 ## Building Blocks
 
-### Broadcast Pseudorandom IDs
+### Broadcast PIDs
 
-### Generate Pseudorandom IDs with Ratchet/KDF
+### Generate PIDs with Ratchet/KDF
 #### Variable Key Duration
 
 ### Distribute Bloom/Cuckoo Filters to Decorrelate IDs
 Server aggregates IDs in a bloom or cuckoo filter. If IDs are derived from a secret, the server performs the derivation and adds the results to the filter. Then only the server know which IDs are correlated to a specific key, but the recepients of the filters do not.
 
-### Randomize Order of Pseudorandom IDs
+### Randomize Order of PIDs
 
-### Spread Secret Shared Pseudorandom IDs
+### Spread Secret Shared PIDs
 Spread IDs to require multiple broadcasts for reconstruction of an ID. This should be compatible with [rotation synchronization](#synchronize-ble-mac-and-id-rotation), since a MAC and reconstructed ID could only be correlated if enough packets are received.
 	
-### Synchronize BLE MAC and ID Rotation
+### Synchronize BLE MAC and PID Rotation
 Sync rotation to mitigate [address-carryover attacks](https://petsymposium.org/2019/files/papers/issue3/popets-2019-0036.pdf).
 	
 ### Sharding
